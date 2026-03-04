@@ -1,0 +1,350 @@
+{
+  "version": "1.0",
+  "updated": "2026-03-03",
+  "description": "Capitalisation des apprentissages au fil du développement. Chaque entrée est créée après une story et consultée avant la suivante pour éviter de reproduire les erreurs et réutiliser les bonnes pratiques.",
+  "categories": {
+    "pattern": "Pattern ou convention découverte / confirmée",
+    "pitfall": "Piège rencontré — à éviter dans les prochaines stories",
+    "fix": "Bug ou erreur corrigée — retenir la solution",
+    "perf": "Optimisation de performance découverte",
+    "design": "Subtilité design (maquette) à ne pas oublier",
+    "tooling": "Astuce outillage (build, Docker, deps, config)",
+    "refactor": "Refactoring à faire ou dette technique identifiée"
+  },
+  "lessons": [
+    {
+      "id": "LL-001",
+      "stories": [
+        "US-001"
+      ],
+      "sprint": "S1",
+      "category": "tooling",
+      "severity": "high",
+      "title": "pydantic-settings is a separate package",
+      "what": "config.py imports from pydantic_settings which is NOT included in pydantic. Build fails if pydantic-settings is missing from pyproject.toml dependencies.",
+      "rule": "Always add pydantic-settings>=2.6.0 as a dependency when using BaseSettings from pydantic_settings.",
+      "files": [
+        "backend/pyproject.toml",
+        "backend/app/config.py"
+      ]
+    },
+    {
+      "id": "LL-002",
+      "stories": [
+        "US-001"
+      ],
+      "sprint": "S1",
+      "category": "tooling",
+      "severity": "high",
+      "title": "Hatchling needs explicit package path",
+      "what": "Hatchling build backend expects a directory matching the project name (aura_wealth_backend). Since our package is named 'app', we must declare [tool.hatch.build.targets.wheel] packages = ['app'].",
+      "rule": "When the Python package directory differs from pyproject.toml project name, always add [tool.hatch.build.targets.wheel] packages = ['app'] to pyproject.toml.",
+      "files": [
+        "backend/pyproject.toml"
+      ]
+    },
+    {
+      "id": "LL-003",
+      "stories": [
+        "US-001"
+      ],
+      "sprint": "S1",
+      "category": "tooling",
+      "severity": "medium",
+      "title": "System Python version mismatch — use venv",
+      "what": "macOS has python3 (3.14) and pip (3.11) pointing to different Pythons. PEP 668 blocks system-level installs. Always use a venv for backend dev.",
+      "rule": "Always create a venv (python3 -m venv .venv) in /backend before installing deps. Document this in CLAUDE.md commands.",
+      "files": [
+        "backend/.venv/"
+      ]
+    },
+    {
+      "id": "LL-004",
+      "stories": [
+        "US-001"
+      ],
+      "sprint": "S1",
+      "category": "pattern",
+      "severity": "medium",
+      "title": "All maquette CSS classes replicated in index.css",
+      "what": "Faithfully copied every CSS class from aura-maquette.html into frontend/src/index.css (glass-panel, card-hover, glow-line, progress-bar, tag, spark-ai, stagger, tab-indicator, tooltip, scrollbar, animations). This is the single source of truth for custom CSS.",
+      "rule": "When adding new CSS from the maquette, always add it to index.css — never inline. Keep Tailwind for utilities, index.css for maquette-specific classes.",
+      "files": [
+        "frontend/src/index.css"
+      ]
+    },
+    {
+      "id": "LL-005",
+      "stories": [
+        "US-002"
+      ],
+      "sprint": "S1",
+      "category": "pattern",
+      "severity": "high",
+      "title": "Tab navigation via Context, not React Router",
+      "what": "The maquette uses tab-based SPA navigation (no URL changes). Using React Router for tab switching adds unnecessary complexity. NavigationContext with useState is simpler and matches the maquette's behavior.",
+      "rule": "Use NavigationContext for tab switching. Keep react-router-dom as a dependency for potential deep-linking later but don't import it in main.tsx until needed.",
+      "files": [
+        "frontend/src/context/NavigationContext.tsx",
+        "frontend/src/App.tsx"
+      ]
+    },
+    {
+      "id": "LL-006",
+      "stories": [
+        "US-002"
+      ],
+      "sprint": "S1",
+      "category": "design",
+      "severity": "medium",
+      "title": "Nav-btn --active-tab CSS variable must be set per button",
+      "what": "The ::after pseudo-element on nav-btn uses var(--active-tab) for its color. This CSS variable must be set via inline style on the active button to match the tab-specific color (gold for home, green for epargne, etc.).",
+      "rule": "When rendering nav buttons, set --active-tab inline style on the active button so the underline color matches the tab identity.",
+      "files": [
+        "frontend/src/components/layout/Header.tsx",
+        "frontend/src/index.css"
+      ]
+    },
+    {
+      "id": "LL-007",
+      "stories": [
+        "US-003"
+      ],
+      "sprint": "S1",
+      "category": "perf",
+      "severity": "high",
+      "title": "Three.js bundle is 615KB — needs lazy import",
+      "what": "Three.js adds ~450KB to the main JS chunk, triggering Vite's 500KB warning. For production, ParticleBackground should be lazy-loaded with React.lazy() + Suspense.",
+      "rule": "When Three.js chunk size becomes a concern, use dynamic import: const ParticleBackground = lazy(() => import('@/components/webgl/ParticleBackground')). Not blocking for MVP but must be done before release.",
+      "files": [
+        "frontend/src/components/webgl/ParticleBackground.tsx",
+        "frontend/src/App.tsx"
+      ]
+    },
+    {
+      "id": "LL-008",
+      "stories": [
+        "US-003"
+      ],
+      "sprint": "S1",
+      "category": "pattern",
+      "severity": "medium",
+      "title": "WebGL cleanup is critical in React strict mode",
+      "what": "React.StrictMode double-mounts in dev. The useEffect cleanup must dispose renderer, geometry, material, and remove the canvas DOM node. Without cleanup, you get duplicate canvases.",
+      "rule": "Always return a cleanup function from WebGL useEffect that calls renderer.dispose(), geo.dispose(), mat.dispose(), cancelAnimationFrame(), and removes event listeners.",
+      "files": [
+        "frontend/src/components/webgl/ParticleBackground.tsx"
+      ]
+    },
+    {
+      "id": "LL-009",
+      "stories": [
+        "US-005",
+        "US-007",
+        "US-008",
+        "US-009",
+        "US-010",
+        "US-011"
+      ],
+      "sprint": "S1",
+      "category": "pattern",
+      "severity": "high",
+      "title": "Dashboard components follow a strict template",
+      "what": "All dashboard blocks follow the same structure: glass-panel p-6 rounded-2xl card-hover, title with icon (font-display text-lg font-light, border-b border-gray-800 pb-2), SparkAi absolute top-4 right-4, data rows in glass-panel-inner p-3 rounded-lg.",
+      "rule": "When creating new blocks for other tabs (Epargne, Bourse, Immo, PE), follow this exact template. The title icon color changes per tab (gold=home, green=epargne, blue=bourse, amber=immo, purple=pe).",
+      "files": [
+        "frontend/src/components/dashboard/"
+      ]
+    },
+    {
+      "id": "LL-010",
+      "stories": [
+        "US-006"
+      ],
+      "sprint": "S1",
+      "category": "design",
+      "severity": "medium",
+      "title": "Tooltip in segmented bar needs tooltip-wrapper CSS class",
+      "what": "The distribution bar segments use tooltip-wrapper class from index.css for hover tooltips. The tooltip must be a child span with class tooltip-text. This pattern will be reused for other segmented bars.",
+      "rule": "Always use the tooltip-wrapper/tooltip-text CSS pattern from index.css for hover tooltips. Don't use a JS-based tooltip for simple hover reveals.",
+      "files": [
+        "frontend/src/components/dashboard/DistributionBar.tsx"
+      ]
+    },
+    {
+      "id": "LL-011",
+      "sprint": "S2",
+      "title": "Unused imports with strict tsconfig",
+      "description": "noUnusedLocals causes build failure for unused imports (e.g. useState imported but not used). Always verify imports match actual usage before building.",
+      "severity": "low",
+      "category": "tooling"
+    },
+    {
+      "id": "LL-012",
+      "sprint": "S3",
+      "title": "Batch component creation scales well",
+      "description": "Creating 7+ components in one batch (all Immo + PE views) then verifying build once is efficient. Pattern: create all files → single build → fix → done.",
+      "severity": "info",
+      "category": "workflow"
+    },
+    {
+      "id": "LL-013",
+      "sprint": "S4",
+      "title": "Context provider for AI panel",
+      "description": "Using React Context for AI panel state (AiContext) allows any SparkAi button to trigger contextual messages without prop drilling. Pattern reusable for any global panel.",
+      "severity": "info",
+      "category": "architecture"
+    },
+    {
+      "id": "LL-014",
+      "sprint": "S4",
+      "title": "Read files before editing",
+      "description": "The Edit tool requires Read first. When batch-editing many files, read all target files in parallel before applying edits to avoid tool errors.",
+      "severity": "medium",
+      "category": "tooling"
+    },
+    {
+      "id": "LL-015",
+      "stories": ["US-100"],
+      "sprint": "S5",
+      "category": "pitfall",
+      "severity": "high",
+      "title": "passlib incompatible with bcrypt>=5.0",
+      "what": "passlib 1.7.4 crashes with bcrypt 5.x due to removed __about__ attribute and changed API. The detect_wrap_bug function fails with ValueError on password length.",
+      "rule": "Use bcrypt directly (bcrypt.hashpw / bcrypt.checkpw) instead of passlib. Drop passlib from dependencies entirely. This is simpler and avoids the abandoned passlib library.",
+      "files": ["backend/pyproject.toml", "backend/app/dependencies.py"]
+    },
+    {
+      "id": "LL-016",
+      "stories": ["US-100"],
+      "sprint": "S5",
+      "category": "pitfall",
+      "severity": "high",
+      "title": "Pydantic EmailStr needs email-validator pkg",
+      "what": "Using pydantic.EmailStr in models requires the email-validator package. Pydantic does not include it by default — must add pydantic[email] to dependencies.",
+      "rule": "When using EmailStr in Pydantic models, declare dependency as pydantic[email]>=2.10.0 in pyproject.toml, not just pydantic>=2.10.0.",
+      "files": ["backend/pyproject.toml", "backend/app/models/user.py"]
+    },
+    {
+      "id": "LL-017",
+      "stories": ["US-100"],
+      "sprint": "S5",
+      "category": "pattern",
+      "severity": "high",
+      "title": "JWT auth with graceful mock fallback",
+      "what": "get_current_user checks is_mongo_available(). When MongoDB is down (dev mode), it returns MOCK_USER without requiring auth. When MongoDB is up, it requires a valid JWT Bearer token.",
+      "rule": "Always maintain the mock fallback in get_current_user so devs can work without MongoDB. The auth endpoints (register/login/refresh) return 503 without DB — this is correct.",
+      "files": ["backend/app/dependencies.py"]
+    },
+    {
+      "id": "LL-018",
+      "stories": ["US-101"],
+      "sprint": "S5",
+      "category": "pattern",
+      "severity": "high",
+      "title": "patrimoine_data stores domain data in 'data' field",
+      "what": "Multi-tenant migration moves from 5 separate collections to one 'patrimoine_data' collection. Each doc has {user_id, domain, data: {...}, updated_at}. Routers must read doc['data'], not doc directly.",
+      "rule": "When querying patrimoine_data, always access doc['data'] for the domain payload. The doc itself has envelope fields (user_id, domain, updated_at) that are not part of the domain model.",
+      "files": ["backend/app/routers/dashboard.py", "backend/app/data/seed.py"]
+    },
+    {
+      "id": "LL-019",
+      "stories": ["US-102"],
+      "sprint": "S5",
+      "category": "pattern",
+      "severity": "high",
+      "title": "AuthGate pattern replaces React Router for auth",
+      "what": "Instead of ProtectedRoute + React Router, we use an AuthGate component in App.tsx that conditionally renders LoginPage/RegisterPage or the authenticated dashboard. This avoids adding react-router-dom complexity since we use tab navigation.",
+      "rule": "Use AuthGate component (isAuthenticated ? dashboard : login) instead of ProtectedRoute + router. Tab navigation via NavigationContext doesn't need URL-based routing for auth.",
+      "files": ["frontend/src/App.tsx"]
+    },
+    {
+      "id": "LL-020",
+      "stories": ["US-102"],
+      "sprint": "S5",
+      "category": "pitfall",
+      "severity": "medium",
+      "title": "Module-level vars trigger TS6133 if only written",
+      "what": "TypeScript's noUnusedLocals treats module-level 'let' variables as unused if they're only assigned but never read. _refreshToken was set in login/logout but never read, causing TS error.",
+      "rule": "If a module-level variable is write-only for now, export a getter function so TS sees it as 'read'. This also prepares the API for future consumers.",
+      "files": ["frontend/src/context/AuthContext.tsx"]
+    },
+    {
+      "id": "LL-021",
+      "stories": ["US-110"],
+      "sprint": "S6",
+      "category": "pattern",
+      "severity": "high",
+      "title": "CRUD via services/patrimoine.py, never direct DB writes",
+      "what": "All domain write operations (PUT/PATCH/reset) go through services/patrimoine.py which handles deep merge, audit logging, and upsert. Routers are thin — they validate auth and delegate.",
+      "rule": "Routers NEVER call db.patrimoine_data.update_one directly. Always use put_domain_data/patch_domain_data/reset_domain_data from services/patrimoine.py. This ensures audit trail consistency.",
+      "files": ["backend/app/services/patrimoine.py", "backend/app/routers/dashboard.py"]
+    },
+    {
+      "id": "LL-022",
+      "stories": ["US-110"],
+      "sprint": "S6",
+      "category": "pattern",
+      "severity": "medium",
+      "title": "Write endpoints require role check, GET does not",
+      "what": "GET endpoints use Depends(get_current_user) — any authenticated user can read. PUT/PATCH/reset use Depends(require_role(abonne, super_admin)) — visiteurs cannot write.",
+      "rule": "All write operations (PUT, PATCH, POST reset, DELETE) must use require_role(). GET endpoints only need get_current_user.",
+      "files": ["backend/app/routers/dashboard.py"]
+    },
+    {
+      "id": "LL-023",
+      "stories": ["US-111"],
+      "sprint": "S6",
+      "category": "pattern",
+      "severity": "high",
+      "title": "InlineEdit + ConfirmDialog pattern for inline editing",
+      "what": "InlineEdit wraps value display with hover pencil → click input → Enter/blur → ConfirmDialog (old vs new) → onSave callback. The ConfirmDialog is rendered inside InlineEdit using pendingValue state. RequireRole fallback renders read-only span for visiteurs.",
+      "rule": "When adding inline editing to any block: use InlineEdit with label prop, format function, and field path. Pass onPatch from parent view via useMutation. InlineEdit handles ConfirmDialog internally.",
+      "files": ["frontend/src/components/shared/InlineEdit.tsx"]
+    },
+    {
+      "id": "LL-024",
+      "stories": ["US-111"],
+      "sprint": "S6",
+      "category": "pitfall",
+      "severity": "high",
+      "title": "PATCH body needs _unflatten_dict for dot-notation keys",
+      "what": "Frontend sends dot-notation keys like {'fiscal.ir': 13000}. The _deep_merge function expects nested dicts. Added _unflatten_dict to convert dot-notation to nested before merging.",
+      "rule": "When frontend sends PATCH with dot-notation field paths, always run _unflatten_dict(patch) before _deep_merge. The audit log still uses _flatten_dict for individual field logging.",
+      "files": ["backend/app/services/patrimoine.py"]
+    },
+    {
+      "id": "LL-025",
+      "stories": ["US-111"],
+      "sprint": "S6",
+      "category": "pattern",
+      "severity": "medium",
+      "title": "useApiData refetch via tick state",
+      "what": "Added refetch() to useApiData by introducing a tick counter as useEffect dependency. Calling refetch increments tick, triggering re-fetch without resetting data (preserves prev state during loading).",
+      "rule": "Use refetch() from useApiData after successful mutations to reload data. The pattern: mutate → toast → refetch. DashboardView passes handlePatch callback to child blocks.",
+      "files": ["frontend/src/hooks/useApiData.ts", "frontend/src/components/dashboard/DashboardView.tsx"]
+    },
+    {
+      "id": "LL-026",
+      "stories": ["US-112"],
+      "sprint": "S6",
+      "category": "pattern",
+      "severity": "high",
+      "title": "Array CRUD via __append_ / __delete_ prefixed PATCH keys",
+      "what": "Frontend sends __append_livrets: {item} to add, __delete_livrets: index to remove, and livrets.{index}: {item} to update an array element. Backend _apply_array_ops extracts these before deep merge.",
+      "rule": "For array mutations, use __append_<field> (append item), __delete_<field> (delete by index), or <field>.<index> (update by index) in PATCH body. Backend handles these in patrimoine.py _apply_array_ops + _deep_merge_with_arrays.",
+      "files": ["backend/app/services/patrimoine.py", "frontend/src/components/epargne/LivretForm.tsx"]
+    },
+    {
+      "id": "LL-027",
+      "stories": ["US-112"],
+      "sprint": "S6",
+      "category": "pattern",
+      "severity": "medium",
+      "title": "Modal form pattern: parent passes livret + index, form manages state",
+      "what": "EpargneView holds editingLivret/editingIndex state. LivretBlock calls onEdit(livret, index) on click. LivretForm receives livret prop to pre-fill, livretIndex for PATCH targeting. onSaved triggers refetch.",
+      "rule": "For modal CRUD forms: parent view owns open/editing state, block component calls onEdit(item, index), form component handles validation/API/toast. onSaved callback triggers parent refetch.",
+      "files": ["frontend/src/components/epargne/EpargneView.tsx", "frontend/src/components/epargne/LivretForm.tsx"]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F3E5AB"/>
+      <stop offset="45%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#AA8020"/>
+    </linearGradient>
+    <linearGradient id="goldV" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#F3E5AB"/>
+      <stop offset="100%" stop-color="#9A7018"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#030303"/>
+  <rect x="10" y="10" width="492" height="492" rx="86" fill="none" stroke="#D4AF37" stroke-width="1" opacity="0.15"/>
+
+  <!--
+    AW Monogram — The W grows out of the A.
+
+    The A is a classic triangle: apex at top-center, two legs going down-left and down-right.
+    The W shares those same two outer legs: left leg of A = left leg of W,
+    right leg of A = right leg of W.
+    The W only adds its inner zigzag (two inner valleys) between the A's legs.
+    The A crossbar ties them together.
+
+    Coordinates (centered at 256,256):
+      A apex:       (256, 100)
+      A/W bottom-left:  (116, 408)
+      A/W bottom-right: (396, 408)
+      W inner-left valley:  (186, 408)
+      W inner peak:         (256, 210)
+      W inner-right valley: (326, 408)
+  -->
+  <g filter="url(#glow)">
+    <!-- A — the two outer legs (shared with W) -->
+    <path
+      d="M116 408 L256 100 L396 408"
+      fill="none" stroke="url(#gold)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"
+    />
+
+    <!-- A crossbar -->
+    <line x1="168" y1="298" x2="344" y2="298"
+          stroke="url(#gold)" stroke-width="16" stroke-linecap="round" opacity="0.85"/>
+
+    <!-- W inner zigzag — grows from the A's legs -->
+    <path
+      d="M186 408 L256 210 L326 408"
+      fill="none" stroke="url(#goldV)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- AI Sparkles — 4-pointed stars -->
+  <g opacity="0.85">
+    <path d="M412 72 L418 96 L442 102 L418 108 L412 132 L406 108 L382 102 L406 96 Z" fill="#F3E5AB"/>
+    <path d="M376 46 L379 58 L391 61 L379 64 L376 76 L373 64 L361 61 L373 58 Z" fill="#D4AF37" opacity="0.7"/>
+    <path d="M442 48 L444 55 L451 57 L444 59 L442 66 L440 59 L433 57 L440 55 Z" fill="#D4AF37" opacity="0.45"/>
+  </g>
+</svg>

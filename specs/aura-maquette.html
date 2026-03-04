@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Wealth — Tableau de Bord Patrimonial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #F3E5AB;
+            --gold-dark: #AA8020;
+            --panel-bg: rgba(0, 0, 0, 0.45);
+            --panel-border: rgba(212, 175, 55, 0.25);
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; }
+        h1, h2, h3, .display-font { font-family: 'Cormorant Garamond', serif; }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .glass-panel-inner {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .text-gold { color: var(--gold); }
+        .border-gold { border-color: var(--gold); }
+        .bg-gold { background: var(--gold); }
+        .bg-gold-gradient { background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #AA8020 100%); }
+        
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(212, 175, 55, 0.5); }
+
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .slide-up { animation: slideUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+        #mobile-menu-btn span { transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+
+        /* Per-tab identity colors */
+        :root {
+            --tab-home: #D4AF37;
+            --tab-finance: #10B981;
+            --tab-bourse: #3B82F6;
+            --tab-immo: #D97706;
+            --active-tab: var(--tab-home);
+        }
+
+        .nav-btn { transition: all 0.3s ease; white-space: nowrap; position: relative; }
+        .nav-btn::after { content: ''; position: absolute; bottom: -2px; left: 50%; width: 0; height: 2px; background: var(--active-tab); transition: all 0.3s ease; transform: translateX(-50%); }
+        .nav-btn.active::after { width: 100%; }
+        
+        #nav-home.active { color: var(--tab-home); }
+        #nav-home.active::after { background: var(--tab-home); }
+        #nav-finance.active { color: var(--tab-finance); }
+        #nav-finance.active::after { background: var(--tab-finance); }
+        #nav-bourse.active { color: var(--tab-bourse); }
+        #nav-bourse.active::after { background: var(--tab-bourse); }
+        #nav-immo.active { color: var(--tab-immo); }
+        #nav-immo.active::after { background: var(--tab-immo); }
+
+        /* Tab-scoped accent overrides */
+        .tab-home .accent-border { border-color: var(--tab-home); }
+        .tab-home .accent-text { color: var(--tab-home); }
+        .tab-home .accent-bg { background: var(--tab-home); }
+        .tab-home .accent-glow { box-shadow: 0 0 20px rgba(212, 175, 55, 0.15); }
+        
+        .tab-finance .accent-border { border-color: var(--tab-finance); }
+        .tab-finance .accent-text { color: var(--tab-finance); }
+        .tab-finance .accent-bg { background: var(--tab-finance); }
+        .tab-finance .accent-glow { box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); }
+        
+        .tab-bourse .accent-border { border-color: var(--tab-bourse); }
+        .tab-bourse .accent-text { color: var(--tab-bourse); }
+        .tab-bourse .accent-bg { background: var(--tab-bourse); }
+        .tab-bourse .accent-glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
+        
+        .tab-immo .accent-border { border-color: var(--tab-immo); }
+        .tab-immo .accent-text { color: var(--tab-immo); }
+        .tab-immo .accent-bg { background: var(--tab-immo); }
+        .tab-immo .accent-glow { box-shadow: 0 0 20px rgba(217, 119, 6, 0.15); }
+
+        .spark-ai { cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 10; }
+        .spark-ai:hover { transform: scale(1.25) rotate(15deg); filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.9)); }
+        
+        .pulse-gold-subtle { animation: pulseGold 2.5s infinite; }
+        @keyframes pulseGold { 
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.35); } 
+            70% { box-shadow: 0 0 0 7px rgba(212, 175, 55, 0); } 
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); } 
+        }
+
+        .progress-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); overflow: hidden; }
+        .progress-bar-fill { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(0.22, 1, 0.36, 1); }
+
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(0,0,0,0.4); border-color: rgba(212, 175, 55, 0.4); }
+
+        .tag { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+
+        .glow-line { height: 1px; background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent); }
+
+        .stagger > * { opacity: 0; animation: fadeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .stagger > *:nth-child(1) { animation-delay: 0.05s; }
+        .stagger > *:nth-child(2) { animation-delay: 0.1s; }
+        .stagger > *:nth-child(3) { animation-delay: 0.15s; }
+        .stagger > *:nth-child(4) { animation-delay: 0.2s; }
+        .stagger > *:nth-child(5) { animation-delay: 0.25s; }
+        .stagger > *:nth-child(6) { animation-delay: 0.3s; }
+
+        .tab-indicator { height: 3px; border-radius: 2px; margin-bottom: 1.5rem; opacity: 0.6; }
+        .tab-home .tab-indicator { background: linear-gradient(90deg, transparent, var(--tab-home), transparent); }
+        .tab-finance .tab-indicator { background: linear-gradient(90deg, transparent, var(--tab-finance), transparent); }
+        .tab-bourse .tab-indicator { background: linear-gradient(90deg, transparent, var(--tab-bourse), transparent); }
+        .tab-immo .tab-indicator { background: linear-gradient(90deg, transparent, var(--tab-immo), transparent); }
+
+        .tooltip-wrapper { position: relative; }
+        .tooltip-wrapper .tooltip-text { visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); border: 1px solid rgba(212,175,55,0.3); padding: 8px 12px; border-radius: 8px; font-size: 13px; color: #ccc; white-space: nowrap; transition: all 0.2s ease; z-index: 100; pointer-events: none; }
+        .tooltip-wrapper:hover .tooltip-text { visibility: visible; opacity: 1; }
+    </style>
+</head>
+<body class="text-white overflow-hidden relative antialiased">
+
+    <div id="webgl-container" class="fixed top-0 left-0 w-screen h-screen -z-10 bg-black"></div>
+
+    <div class="relative w-full h-screen overflow-y-auto px-4 py-6 md:px-10 md:py-8 max-w-7xl mx-auto pb-32">
+        
+        <!-- HEADER -->
+        <header class="flex items-center justify-between glass-panel rounded-2xl px-5 py-4 relative z-30">
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <div class="w-8 h-8 rounded-full bg-gold-gradient flex items-center justify-center">
+                    <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                </div>
+                <h1 class="text-lg md:text-2xl font-light tracking-[0.2em] text-gold uppercase display-font">Aura Wealth</h1>
+            </div>
+            
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center gap-1 lg:gap-4">
+                <button id="nav-home" onclick="navigateTo('home')" class="nav-btn active text-gold pb-1 px-3 text-sm lg:text-base font-medium tracking-wide">Tableau de Bord</button>
+                <button id="nav-finance" onclick="navigateTo('finance')" class="nav-btn text-gray-400 hover:text-gray-200 pb-1 px-3 text-sm lg:text-base font-medium tracking-wide">Épargne</button>
+                <button id="nav-bourse" onclick="navigateTo('bourse')" class="nav-btn text-gray-400 hover:text-gray-200 pb-1 px-3 text-sm lg:text-base font-medium tracking-wide">Bourse & Crypto</button>
+                <button id="nav-immo" onclick="navigateTo('immo')" class="nav-btn text-gray-400 hover:text-gray-200 pb-1 px-3 text-sm lg:text-base font-medium tracking-wide">Immobilier</button>
+            </nav>
+
+            <!-- Mobile Hamburger -->
+            <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                <span class="block w-5 h-0.5 bg-gold rounded-full transition-transform" id="burger-1"></span>
+                <span class="block w-5 h-0.5 bg-gold rounded-full transition-opacity" id="burger-2"></span>
+                <span class="block w-5 h-0.5 bg-gold rounded-full transition-transform" id="burger-3"></span>
+            </button>
+        </header>
+
+        <!-- Mobile Dropdown Nav -->
+        <div id="mobile-nav" class="hidden md:hidden glass-panel rounded-xl mt-2 p-3 z-30 relative slide-up">
+            <div class="flex flex-col gap-1">
+                <button id="nav-home-m" onclick="navigateTo('home');toggleMobileMenu()" class="text-left text-gold font-medium py-2.5 px-4 rounded-lg bg-gold/5 text-sm">Tableau de Bord</button>
+                <button id="nav-finance-m" onclick="navigateTo('finance');toggleMobileMenu()" class="text-left text-gray-400 hover:text-white font-medium py-2.5 px-4 rounded-lg hover:bg-white/5 text-sm">Épargne & Placements</button>
+                <button id="nav-bourse-m" onclick="navigateTo('bourse');toggleMobileMenu()" class="text-left text-gray-400 hover:text-white font-medium py-2.5 px-4 rounded-lg hover:bg-white/5 text-sm">Bourse & Crypto</button>
+                <button id="nav-immo-m" onclick="navigateTo('immo');toggleMobileMenu()" class="text-left text-gray-400 hover:text-white font-medium py-2.5 px-4 rounded-lg hover:bg-white/5 text-sm">Immobilier</button>
+            </div>
+        </div>
+
+        <!-- Date between header and content -->
+        <div class="flex items-center justify-end py-3 px-1 text-xs text-gray-500">
+            <svg class="w-3.5 h-3.5 mr-1.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Dernière mise à jour : <span class="text-gray-300 ml-1" id="last-update"></span>
+        </div>
+
+        <!-- ===================== TAB 1: TABLEAU DE BORD ===================== -->
+        <div id="view-home" class="fade-in space-y-6 tab-home">
+            <div class="tab-indicator"></div>
+            
+            <!-- KPI Row -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 stagger">
+                <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center relative overflow-hidden border-t-2 border-t-gold/50 card-hover">
+                    <div class="absolute top-3 right-3 w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center spark-ai pulse-gold-subtle" onclick="triggerAiContext('Patrimoine Brut', 'Le Patrimoine Brut est l\'addition de la valeur de tous vos actifs (comptes, bourse, immobilier) sans déduire vos emprunts en cours. C\'est la valeur totale de tout ce que vous possédez.')">
+                        <svg class="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    </div>
+                    <h2 class="text-gray-400 text-sm font-bold tracking-widest uppercase mb-1">Patrimoine Brut</h2>
+                    <p class="text-4xl font-light text-white tracking-tight display-font">1 465 800 <span class="text-xl text-gray-400">€</span></p>
+                    <p class="text-xs text-green-400/80 mt-2">▲ +3.2% depuis Janv.</p>
+                </div>
+                
+                <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center relative overflow-hidden bg-gradient-to-br from-black/40 to-[#D4AF37]/10 card-hover">
+                    <div class="absolute top-3 right-3 w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center spark-ai pulse-gold-subtle" onclick="triggerAiContext('Patrimoine Net', 'Le Patrimoine Net est votre vraie richesse : Patrimoine Brut moins vos dettes (420 000 € de CRD). C\'est cet indicateur que nous cherchons à faire croître. Patrimoine Net = 1 465 800 - 420 000 = 1 045 800 €')">
+                        <svg class="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    </div>
+                    <h2 class="text-gold text-sm font-bold tracking-widest uppercase mb-1">Patrimoine Net</h2>
+                    <p class="text-4xl font-semibold text-gold tracking-tight display-font">1 045 800 <span class="text-xl text-gold/60">€</span></p>
+                    <p class="text-xs text-gray-400 mt-2">Brut − Capital Restant Dû</p>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center relative overflow-hidden border-t-2 border-t-blue-500/50 card-hover">
+                    <div class="absolute top-3 right-3 w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center spark-ai pulse-gold-subtle" onclick="triggerAiContext('Projection 10 ans', 'Calcul basé sur un taux de rendement moyen pondéré de 4.8% (net d\'inflation estimée) et un effort d\'épargne mensuel constant de 1 500 €, grâce à la magie des intérêts composés. Formule : VF = VA × (1+r)^n + PMT × [((1+r)^n - 1) / r]')">
+                        <svg class="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    </div>
+                    <h2 class="text-blue-400 text-sm font-bold tracking-widest uppercase mb-1">Projection à 10 ans (Net)</h2>
+                    <p class="text-4xl font-light text-white tracking-tight display-font">1 785 000 <span class="text-xl text-gray-400">€</span></p>
+                    <p class="text-xs text-gray-400 mt-1">Hypothèse : +4.8% / an</p>
+                </div>
+            </div>
+
+            <!-- Répartition Patrimoniale Bar -->
+            <div class="glass-panel p-5 rounded-2xl">
+                <h2 class="text-sm font-bold tracking-widest uppercase text-gray-400 mb-3">Répartition Patrimoniale</h2>
+                <div class="flex rounded-full overflow-hidden h-3 bg-black/40">
+                    <div class="bg-amber-600 tooltip-wrapper" style="width:85.3%"><span class="tooltip-text">Immobilier — 1 250 000 € (85.3%)</span></div>
+                    <div class="bg-blue-500 tooltip-wrapper" style="width:5.7%"><span class="tooltip-text">Bourse PEA — 84 200 € (5.7%)</span></div>
+                    <div class="bg-purple-500 tooltip-wrapper" style="width:2.2%"><span class="tooltip-text">Crypto — 32 800 € (2.2%)</span></div>
+                    <div class="bg-green-500 tooltip-wrapper" style="width:5.9%"><span class="tooltip-text">Épargne & Retraite — 86 350 € (5.9%)</span></div>
+                    <div class="bg-gray-400 tooltip-wrapper" style="width:0.9%"><span class="tooltip-text">Liquidités — 12 450 € (0.9%)</span></div>
+                </div>
+                <div class="flex flex-wrap gap-x-5 gap-y-1 mt-3 text-xs text-gray-400">
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-600"></span> Immobilier 85%</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> PEA 5.7%</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-purple-500"></span> Crypto 2.2%</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Épargne 5.9%</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-gray-400"></span> Liquidités 0.9%</span>
+                </div>
+            </div>
+
+            <!-- Row: Trésorerie + Endettement -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="glass-panel p-6 rounded-2xl relative card-hover">
+                    <div class="absolute top-4 right-4 w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center spark-ai pulse-gold-subtle" onclick="triggerAiContext('Liquidités', 'Vos liquidités immédiates représentent l\'argent non bloqué. La règle d\'or est de conserver 3 à 6 mois de dépenses sur des livrets (épargne de précaution) et d\'investir le reste.')">
+                        <svg class="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    </div>
+                    <h2 class="text-lg font-light text-white mb-4 border-b border-gray-800 pb-2 flex items-center display-font">
+                        <svg class="w-5 h-5 mr-2 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        Trésorerie & Épargne Disponible
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center glass-panel-inner p-3 rounded-lg">
+                            <div>
+                                <p class="text-sm font-medium text-white">Comptes Courants</p>
+                                <p class="text-xs text-gray-500">LCL, Boursorama</p>
+                            </div>
+                            <p class="text-xl font-semibold">12 450 €</p>
+                        </div>
+                        <div class="flex justify-between items-center glass-panel-inner p-3 rounded-lg">
+                            <div>
+                                <p class="text-sm font-medium text-white">Épargne de Précaution</p>
+                                <p class="text-xs text-gray-500">Livret A, LDDS</p>
+                            </div>
+                            <p class="text-xl font-semibold">34 950 €</p>
+                        </div>
+                        <div class="glow-line my-3"></div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-400">Taux d'épargne mensuel :</span>
+                            <span class="tag bg-green-500/15 text-green-400 border border-green-500/30">22% — Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl relative card-hover border-l-4 border-l-blue-500/50">
+                    <div class="absolute top-4 right-4 w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center spark-ai pulse-gold-subtle" onclick="triggerAiContext('Capacité d\'Emprunt', 'Selon les normes du HCSF, votre taux d\'endettement maximal est de 35% (assurance incluse). Avec vos revenus et vos crédits actuels, il vous reste environ 900 € de mensualité disponible, soit une capacité d\'emprunt d\'environ 150 000 € sur 20 ans au taux actuel (~3.5%).')">
+                        <svg class="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    </div>
+                    <h2 class="text-lg font-light text-white mb-4 border-b border-gray-800 pb-2 flex items-center display-font">
+                        <svg class="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+                        Endettement & Levier Bancaire
+                    </h2>
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div class="glass-panel-inner p-3 rounded-lg">
+                            <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Capital Restant Dû</p>
+                            <p class="text-xl font-medium text-white mt-1">420 000 €</p>
+                        </div>
+                        <div class="glass-panel-inner p-3 rounded-lg">
+                            <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Taux d'endettement</p>
+                            <p class="text-xl font-medium text-blue-400 mt-1">24.5 %</p>
+                            <div class="progress-bar mt-2">
+                                <div class="progress-bar-fill bg-blue-500" style="width: 70%"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Max HCSF : 35%</p>
+                        </div>
+                    </div>
+                    <div class="bg-blue-900/10 p-3 rounded-lg border border-blue-500/30 flex justify-between items-center">
+                        <span class="text-sm text-blue-100">Capacité d'emprunt résiduelle :</span>
+                        <span class="text-lg font-bold text-blue-400">~ 150 000 €</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row: Moteur Immo + Fiscal -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="glass-panel p-6 rounded-2xl relative card-hover">
+                    <div class="absolute top-4 right-4 w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center spark-ai pulse-gold-subtle" onclick="triggerAiContext('Revenus Locatifs', 'Ces revenus (16 800 €/an) proviennent de vos biens en location. Grâce à votre statut LMNP au régime réel, l\'amortissement comptable gomme la quasi-totalité de l\'impôt sur ces loyers. Cash-flow net positif de +850 €/mois.')">
+                        <svg class="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    </div>
+                    <h2 class="text-lg font-light text-white mb-4 border-b border-gray-800 pb-2 flex items-center display-font">
+                        <svg class="w-5 h-5 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        Moteur Immobilier
+                    </h2>
+                    <div class="flex flex-col space-y-4">
+                        <div>
+                            <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Revenus Locatifs Annuels (Bruts)</p>
+                            <div class="flex items-baseline mt-1">
+                                <p class="text-3xl font-semibold text-white display-font">16 800 €</p>
+                                <p class="text-sm text-gray-400 ml-2">soit 1 400 € / mois</p>
+                            </div>
+                        </div>
+                        <div class="glass-panel-inner p-3 rounded-lg text-sm">
+                            <div class="flex justify-between text-gray-300 mb-1">
+                                <span>Mensualités Crédits Immo :</span>
+                                <span class="text-red-400">- 13 200 € / an</span>
+                            </div>
+                            <div class="glow-line my-2"></div>
+                            <div class="flex justify-between font-medium">
+                                <span class="text-white">Cash-Flow Net :</span>
+                                <span class="text-green-400 text-lg font-bold">+ 850 € / mois</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl relative card-hover border-l-4 border-l-red-500/50">
+                    <div class="absolute top-4 right-4 w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center spark-ai pulse-gold-subtle" onclick="triggerAiContext('Pression Fiscale', 'Voici ce que vous payez à l\'État. Votre TMI est de 30%. Économie potentielle pour 10 000 € placés en PER : 3 000 € de réduction d\'IR. Stratégies : versements PER, déficit foncier, LMNP au réel.')">
+                        <svg class="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    </div>
+                    <h2 class="text-lg font-light text-white mb-4 border-b border-gray-800 pb-2 flex items-center display-font">
+                        <svg class="w-5 h-5 mr-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Moniteur Fiscal
+                    </h2>
+                    
+                    <!-- TMI Selector -->
+                    <div class="mb-4">
+                        <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-2">Votre Tranche Marginale (TMI)</p>
+                        <div class="flex gap-1">
+                            <span class="px-3 py-1 rounded-full text-xs bg-black/40 text-gray-500 border border-gray-700">11%</span>
+                            <span class="px-3 py-1 rounded-full text-xs bg-gold/20 text-gold border border-gold/50 font-bold">30%</span>
+                            <span class="px-3 py-1 rounded-full text-xs bg-black/40 text-gray-500 border border-gray-700">41%</span>
+                            <span class="px-3 py-1 rounded-full text-xs bg-black/40 text-gray-500 border border-gray-700">45%</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 mb-4 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Impôt sur le Revenu (IR)</span>
+                            <span class="font-medium text-white">12 500 €</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Prélèvements Sociaux (17.2%)</span>
+                            <span class="font-medium text-white">1 200 €</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Taxes Foncières</span>
+                            <span class="font-medium text-white">2 800 €</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">IFI</span>
+                            <span class="tag bg-green-500/15 text-green-400 border border-green-500/30">Exonéré (< 1.3M€)</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-900/20 p-3 rounded-lg border border-red-500/30 flex justify-between items-center mb-3">
+                        <span class="text-sm font-medium text-red-200">Total payé (Annuel) :</span>
+                        <span class="text-xl font-bold text-red-400">16 500 €</span>
+                    </div>
+                    <div class="bg-gold/5 p-3 rounded-lg border border-gold/20 flex justify-between items-center">
+                        <span class="text-sm text-gold/80">Économie si 10 000 € en PER :</span>
+                        <span class="text-lg font-bold text-gold">3 000 €</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dernières Opérations -->
+            <div class="glass-panel p-6 rounded-2xl">
+                <h2 class="text-lg font-light text-white mb-4 border-b border-gray-800 pb-2 flex items-center display-font">
+                    <svg class="w-5 h-5 mr-2 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    Dernières Opérations (Compte Courant)
+                </h2>
+                <div class="space-y-2 stagger">
+                    <div class="flex justify-between items-center glass-panel-inner p-3 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-green-500/15 flex items-center justify-center"><svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path></svg></div>
+                            <div><p class="text-sm text-white">Virement Salaire</p><p class="text-xs text-gray-500">Aujourd'hui</p></div>
+                        </div>
+                        <span class="text-green-400 font-semibold">+ 4 500 €</span>
+                    </div>
+                    <div class="flex justify-between items-center glass-panel-inner p-3 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-red-500/15 flex items-center justify-center"><svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path></svg></div>
+                            <div><p class="text-sm text-white">Prélèvement EDF</p><p class="text-xs text-gray-500">Hier</p></div>
+                        </div>
+                        <span class="text-red-400 font-semibold">- 120 €</span>
+                    </div>
+                    <div class="flex justify-between items-center glass-panel-inner p-3 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-red-500/15 flex items-center justify-center"><svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path></svg></div>
+                            <div><p class="text-sm text-white">Carte CB Restaurant</p><p class="text-xs text-gray-500">Lun. 23 Fév</p></div>
+                        </div>
+                        <span class="text-red-400 font-semibold">- 85 €</span>
+                    </div>
+                    <div class="flex justify-between items-center glass-panel-inner p-3 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-500/15 flex items-center justify-center"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg></div>
+                            <div><p class="text-sm text-white">Virement vers PEA</p><p class="text-xs text-gray-500">Lun. 23 Fév</p></div>
+                        </div>
+                        <span class="text-blue-400 font-semibold">- 500 €</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== TAB 2: ÉPARGNE & PLACEMENTS ===================== -->
+        <div id="view-finance" class="hidden fade-in space-y-6 tab-finance">
+            <div class="tab-indicator"></div>
+            
+            <!-- KPI Épargne -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 stagger">
+                <div class="glass-panel p-6 rounded-2xl text-center card-hover border-t-2" style="border-top-color: rgba(16,185,129,0.5)">
+                    <h2 class="text-gray-400 text-sm font-bold tracking-widest uppercase mb-1">Épargne Totale</h2>
+                    <p class="text-4xl font-light text-white tracking-tight display-font">86 350 <span class="text-xl text-gray-400">€</span></p>
+                    <p class="text-xs text-gray-400 mt-1">Livret A + PER + PERCOL</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl text-center card-hover border-t-2" style="border-top-color: rgba(16,185,129,0.5)">
+                    <h2 class="text-sm font-bold tracking-widest uppercase mb-1" style="color:#10B981">Effort d'Épargne Mensuel</h2>
+                    <p class="text-4xl font-light tracking-tight display-font" style="color:#10B981">1 500 <span class="text-xl" style="color:rgba(16,185,129,0.6)">€</span></p>
+                    <p class="text-xs text-gray-400 mt-1">22% des revenus nets</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl text-center card-hover border-t-2" style="border-top-color: rgba(16,185,129,0.3)">
+                    <h2 class="text-gray-400 text-sm font-bold tracking-widest uppercase mb-1">Prévoyance (Capital Décès)</h2>
+                    <p class="text-4xl font-light text-purple-300 tracking-tight display-font">150 000 <span class="text-xl text-gray-400">€</span></p>
+                    <p class="text-xs text-gray-400 mt-1">Garantie contractuelle</p>
+                </div>
+            </div>
+
+            <!-- Détail Épargne -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Livrets & Sécurité -->
+                <div class="glass-panel p-6 rounded-2xl card-hover">
+                    <h2 class="text-lg font-light text-white mb-4 border-b border-gray-800 pb-2 flex items-center display-font">
+                        <svg class="w-5 h-5 mr-2" style="color:#10B981" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        Épargne de Précaution & Livrets
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center glass-panel-inner p-4 rounded-lg">
+                            <div>
+                                <p class="text-sm font-medium text-white">Livret A</p>
+                                <p class="text-xs text-gray-500">Taux : 2.4% net • Plafond 22 950 €</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xl font-semibold">22 950 €</p>
+                                <span class="tag bg-amber-500/15 text-amber-400 border border-amber-500/30">Plein</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center glass-panel-inner p-4 rounded-lg">
+                            <div>
+                                <p class="text-sm font-medium text-white">LDDS</p>
+                                <p class="text-xs text-gray-500">Taux : 2.4% net • Plafond 12 000 €</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xl font-semibold">12 000 €</p>
+                                <span class="tag bg-amber-500/15 text-amber-400 border border-amber-500/30">Plein</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glow-line my-4"></div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400">Total Livrets Réglementés :</span>
+                        <span class="text-lg font-bold text-white">34 950 €</span>
+                    </div>
+                </div>
+
+                <!-- Retraite -->
+                <div class="glass-panel p-6 rounded-2xl card-hover border-l-4" style="border-left-color: rgba(16,185,129,0.5)">
+                    <h2 class="text-lg font-light text-white mb-4 border-b border-gray-800 pb-2 flex items-center display-font">
+                        <svg class="w-5 h-5 mr-2" style="color:#10B981" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Épargne Retraite
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center glass-panel-inner p-4 rounded-lg relative">
+                            <div class="absolute top-2 right-2 spark-ai" onclick="triggerAiContext('PER', 'Le Plan d\'Épargne Retraite individuel est déductible de votre revenu imposable. Avec un TMI à 30%, chaque euro versé vous fait économiser 30 centimes d\'impôt. Plafond annuel de déduction : environ 10% de vos revenus N-1.')">
+                                <svg class="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-white">PER Individuel</p>
+                                <p class="text-xs text-gray-500">Déductible IR • Bloqué jusqu'à la retraite</p>
+                            </div>
+                            <p class="text-xl font-semibold" style="color:#10B981">45 100 €</p>
+                        </div>
+                        <div class="flex justify-between items-center glass-panel-inner p-4 rounded-lg">
+                            <div>
+                                <p class="text-sm font-medium text-white">PERCOL (Entreprise)</p>
+                                <p class="text-xs text-gray-500">Abondement employeur • Gestion pilotée</p>
+                            </div>
+                            <p class="text-xl font-semibold">18 300 €</p>
+                        </div>
+                    </div>
+                    <div class="glow-line my-4"></div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400">Total Retraite :</span>
+                        <span class="text-lg font-bold" style="color:#10B981">63 400 €</span>
+                    </div>
+                    <div class="p-3 rounded-lg border mt-3 text-sm text-gray-300" style="background:rgba(16,185,129,0.05); border-color:rgba(16,185,129,0.2)">
+                        <span class="font-medium" style="color:#10B981">💡 Astuce :</span> Versez 10 000 € sur votre PER avant le 31/12 pour économiser 3 000 € d'IR (TMI 30%).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prévoyance & Assurance -->
+            <div class="glass-panel p-6 rounded-2xl card-hover">
+                <h2 class="text-lg font-light text-white mb-4 border-b border-gray-800 pb-2 flex items-center display-font">
+                    <svg class="w-5 h-5 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    Prévoyance & Assurance
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="glass-panel-inner p-4 rounded-lg text-center">
+                        <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Capital Décès Garanti</p>
+                        <p class="text-2xl font-semibold text-purple-300 mt-2 display-font">150 000 €</p>
+                        <p class="text-xs text-gray-500 mt-1">Bénéficiaires désignés</p>
+                    </div>
+                    <div class="glass-panel-inner p-4 rounded-lg text-center">
+                        <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Assurance Emprunteur</p>
+                        <p class="text-2xl font-semibold text-white mt-2 display-font">420 000 €</p>
+                        <p class="text-xs text-gray-500 mt-1">Couvre le CRD</p>
+                    </div>
+                    <div class="glass-panel-inner p-4 rounded-lg text-center">
+                        <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Responsabilité Civile PNO</p>
+                        <p class="text-sm font-medium text-green-400 mt-3">✓ Active</p>
+                        <p class="text-xs text-gray-500 mt-1">Tous biens locatifs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== TAB 3: BOURSE & CRYPTO ===================== -->
+        <div id="view-bourse" class="hidden fade-in space-y-6 tab-bourse">
+            <div class="tab-indicator"></div>
+            
+            <!-- KPI Bourse -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 stagger">
+                <div class="glass-panel p-6 rounded-2xl text-center card-hover border-t-2" style="border-top-color: rgba(59,130,246,0.5)">
+                    <h2 class="text-gray-400 text-sm font-bold tracking-widest uppercase mb-1">Actifs Financiers</h2>
+                    <p class="text-4xl font-light text-white tracking-tight display-font">117 000 <span class="text-xl text-gray-400">€</span></p>
+                    <p class="text-xs text-gray-400 mt-1">PEA + Crypto</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl text-center card-hover border-t-2" style="border-top-color: rgba(59,130,246,0.5)">
+                    <h2 class="text-sm font-bold tracking-widest uppercase mb-1" style="color:#3B82F6">PEA (Actions)</h2>
+                    <p class="text-4xl font-semibold tracking-tight display-font" style="color:#3B82F6">84 200 <span class="text-xl" style="color:rgba(59,130,246,0.6)">€</span></p>
+                    <p class="text-xs text-green-400/80 mt-1">▲ +12.4% YTD</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl text-center card-hover border-t-2" style="border-top-color: rgba(59,130,246,0.3)">
+                    <h2 class="text-purple-400 text-sm font-bold tracking-widest uppercase mb-1">Crypto (Total)</h2>
+                    <p class="text-4xl font-light text-purple-300 tracking-tight display-font">32 800 <span class="text-xl text-gray-400">€</span></p>
+                    <p class="text-xs text-green-400/80 mt-1">▲ +28.7% YTD</p>
+                </div>
+            </div>
+
+            <!-- PEA Détail -->
+            <div class="glass-panel p-6 rounded-2xl card-hover">
+                <div class="absolute top-4 right-4 w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center spark-ai pulse-gold-subtle" onclick="triggerAiContext('PEA', 'Le PEA est l\'enveloppe fiscale reine pour les actions européennes. Après 5 ans de détention, vos plus-values ne sont soumises qu\'aux prélèvements sociaux (17.2%) et sont exonérées d\'IR. Plafond de versement : 150 000 €. Vous avez encore de la marge.')">
+                    <svg class="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                </div>
+                <h2 class="text-lg font-light text-white mb-4 border-b border-gray-800 pb-2 flex items-center display-font">
+                    <svg class="w-5 h-5 mr-2" style="color:#3B82F6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    Actions (PEA) — 84 200 €
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="glass-panel-inner p-4 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-white">ETF MSCI World</span>
+                            <span class="tag bg-blue-500/15 text-blue-400 border border-blue-500/30">ETF</span>
+                        </div>
+                        <p class="text-xl font-semibold">42 500 €</p>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>50.5% du PEA</span>
+                            <span class="text-green-400">+14.2%</span>
+                        </div>
+                        <div class="progress-bar mt-2"><div class="progress-bar-fill bg-blue-500" style="width:50.5%"></div></div>
+                    </div>
+                    <div class="glass-panel-inner p-4 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-white">ETF S&P 500 (EUR)</span>
+                            <span class="tag bg-blue-500/15 text-blue-400 border border-blue-500/30">ETF</span>
+                        </div>
+                        <p class="text-xl font-semibold">25 700 €</p>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>30.5% du PEA</span>
+                            <span class="text-green-400">+18.6%</span>
+                        </div>
+                        <div class="progress-bar mt-2"><div class="progress-bar-fill bg-blue-400" style="width:30.5%"></div></div>
+                    </div>
+                    <div class="glass-panel-inner p-4 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-white">Actions Individuelles</span>
+                            <span class="tag bg-amber-500/15 text-amber-400 border border-amber-500/30">Stock</span>
+                        </div>
+                        <p class="text-xl font-semibold">12 800 €</p>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>15.2% du PEA</span>
+                            <span class="text-red-400">-2.1%</span>
+                        </div>
+                        <div class="progress-bar mt-2"><div class="progress-bar-fill bg-amber-500" style="width:15.2%"></div></div>
+                    </div>
+                    <div class="glass-panel-inner p-4 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-white">Liquidités PEA</span>
+                            <span class="tag bg-gray-500/15 text-gray-400 border border-gray-500/30">Cash</span>
+                        </div>
+                        <p class="text-xl font-semibold">3 200 €</p>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>3.8% du PEA</span>
+                            <span>—</span>
+                        </div>
+                        <div class="progress-bar mt-2"><div class="progress-bar-fill bg-gray-500" style="width:3.8%"></div></div>
+                    </div>
+                </div>
+                <div class="p-3 rounded-lg border mt-4 flex justify-between items-center text-sm" style="background:rgba(59,130,246,0.05); border-color:rgba(59,130,246,0.2)">
+                    <span class="text-gray-300">Versement PEA restant autorisé :</span>
+                    <span class="font-bold" style="color:#3B82F6">65 800 € <span class="text-xs text-gray-500">(plafond 150 000 €)</span></span>
+                </div>
+            </div>
+
+            <!-- Crypto Détail -->
+            <div class="glass-panel p-6 rounded-2xl card-hover">
+                <div class="absolute top-4 right-4 w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center spark-ai pulse-gold-subtle" onclick="triggerAiContext('Crypto', 'Les actifs numériques sont soumis à la flat tax de 30% (12.8% IR + 17.2% PS) sur les plus-values réalisées lors d\'une conversion en fiat (€). Les échanges crypto-to-crypto ne sont pas imposables. Pensez à tenir un registre pour votre déclaration.')">
+                    <svg class="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                </div>
+                <h2 class="text-lg font-light text-white mb-4 border-b border-gray-800 pb-2 flex items-center display-font">
+                    <svg class="w-5 h-5 mr-2" style="color:#3B82F6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    Actifs Numériques (Crypto) — 32 800 €
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="glass-panel-inner p-4 rounded-lg">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center text-xs font-bold text-orange-400">₿</div>
+                            <span class="text-sm font-medium text-white">Bitcoin (BTC)</span>
+                        </div>
+                        <p class="text-xl font-semibold">18 500 €</p>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>56.4% de la poche</span>
+                            <span class="text-green-400">+42.1%</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel-inner p-4 rounded-lg">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-xs font-bold text-blue-400">Ξ</div>
+                            <span class="text-sm font-medium text-white">Ethereum (ETH)</span>
+                        </div>
+                        <p class="text-xl font-semibold">10 200 €</p>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>31.1% de la poche</span>
+                            <span class="text-green-400">+18.3%</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel-inner p-4 rounded-lg">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-6 h-6 rounded-full bg-gray-500/20 flex items-center justify-center text-xs font-bold text-gray-400">◆</div>
+                            <span class="text-sm font-medium text-white">Altcoins divers</span>
+                        </div>
+                        <p class="text-xl font-semibold">4 100 €</p>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>12.5% de la poche</span>
+                            <span class="text-red-400">-8.2%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="glow-line my-4"></div>
+                <div class="flex flex-wrap gap-4 text-sm text-gray-400">
+                    <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-orange-500"></span> Binance</span>
+                    <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Ledger (Cold Wallet)</span>
+                    <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-indigo-500"></span> Coinbase</span>
+                </div>
+                <div class="p-3 rounded-lg border mt-3 text-sm text-gray-300" style="background:rgba(59,130,246,0.05); border-color:rgba(59,130,246,0.2)">
+                    <span class="font-medium" style="color:#3B82F6">⚠️ Rappel fiscal :</span> Flat tax 30% sur les plus-values réalisées (conversion crypto → €). Échanges crypto-crypto : non imposables.
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== TAB 4: IMMOBILIER ===================== -->
+        <div id="view-immo" class="hidden fade-in space-y-6 tab-immo">
+            <div class="tab-indicator"></div>
+            
+            <!-- KPI Immo -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-5 stagger">
+                <div class="glass-panel p-5 rounded-2xl text-center card-hover border-t-2" style="border-top-color: rgba(217,119,6,0.5)">
+                    <h2 class="text-gray-400 text-sm font-bold tracking-widest uppercase mb-1">Valeur Vénale</h2>
+                    <p class="text-3xl font-light tracking-tight display-font" style="color:#D97706">1 250 000 <span class="text-lg text-gray-400">€</span></p>
+                    <p class="text-xs text-gray-400 mt-1">85% du patrimoine</p>
+                </div>
+                <div class="glass-panel p-5 rounded-2xl text-center card-hover border-t-2" style="border-top-color: rgba(217,119,6,0.3)">
+                    <h2 class="text-gray-400 text-sm font-bold tracking-widest uppercase mb-1">Capital Restant Dû</h2>
+                    <p class="text-3xl font-light text-red-400 tracking-tight display-font">420 000 <span class="text-lg text-gray-400">€</span></p>
+                    <p class="text-xs text-gray-400 mt-1">Tous crédits immo</p>
+                </div>
+                <div class="glass-panel p-5 rounded-2xl text-center card-hover border-t-2" style="border-top-color: rgba(217,119,6,0.5)">
+                    <h2 class="text-gray-400 text-sm font-bold tracking-widest uppercase mb-1">Cash-Flow Net</h2>
+                    <p class="text-3xl font-light text-green-400 tracking-tight display-font">+ 850 <span class="text-lg text-gray-400">€/mois</span></p>
+                    <p class="text-xs text-gray-400 mt-1">Après charges & crédits</p>
+                </div>
+                <div class="glass-panel p-5 rounded-2xl text-center card-hover border-t-2" style="border-top-color: rgba(217,119,6,0.3)">
+                    <h2 class="text-gray-400 text-sm font-bold tracking-widest uppercase mb-1">Rendement Moyen</h2>
+                    <p class="text-3xl font-light text-white tracking-tight display-font">4.5 <span class="text-lg text-gray-400">%</span></p>
+                    <p class="text-xs text-gray-400 mt-1">Pondéré net de charges</p>
+                </div>
+            </div>
+
+            <!-- Parc LMNP -->
+            <div class="glass-panel p-6 rounded-2xl card-hover">
+                <div class="absolute top-4 right-4 w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center spark-ai pulse-gold-subtle" onclick="triggerAiContext('LMNP', 'Le statut LMNP (Loueur Meublé Non Professionnel) au régime réel permet d\'amortir le bien et les meubles, réduisant à quasi zéro l\'imposition sur les loyers perçus. C\'est une des niches fiscales les plus puissantes pour l\'investisseur immobilier en France.')">
+                    <svg class="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                </div>
+                <h2 class="text-lg font-light text-white mb-5 border-b border-gray-800 pb-2 flex items-center display-font">
+                    <svg class="w-5 h-5 mr-2" style="color:#D97706" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    Parc LMNP — 2 Biens Actifs
+                    <span class="ml-auto tag bg-green-500/15 text-green-400 border border-green-500/30">100% Occupé</span>
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <!-- Bien 1 -->
+                    <div class="glass-panel-inner p-5 rounded-xl border-l-4" style="border-left-color: rgba(217,119,6,0.6)">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="text-base font-semibold display-font" style="color:#D97706">Studio Étudiant — Lyon 7</h3>
+                                <p class="text-xs text-gray-500">Meublé • LMNP Réel • Acquis 2021</p>
+                            </div>
+                            <span class="tag bg-green-500/15 text-green-400 border border-green-500/30">Loué</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">Loyer Mensuel</p>
+                                <p class="text-lg font-semibold text-white">620 €</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">Rendement Net</p>
+                                <p class="text-lg font-semibold text-green-400">4.8 %</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">Valeur Estimée</p>
+                                <p class="text-sm text-white">155 000 €</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">CRD</p>
+                                <p class="text-sm text-red-400">72 000 €</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bien 2 -->
+                    <div class="glass-panel-inner p-5 rounded-xl border-l-4" style="border-left-color: rgba(217,119,6,0.6)">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="text-base font-semibold display-font" style="color:#D97706">T2 — Bordeaux</h3>
+                                <p class="text-xs text-gray-500">Meublé • LMNP Réel • Acquis 2022</p>
+                            </div>
+                            <span class="tag bg-green-500/15 text-green-400 border border-green-500/30">Loué</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">Loyer Mensuel</p>
+                                <p class="text-lg font-semibold text-white">780 €</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">Rendement Net</p>
+                                <p class="text-lg font-semibold text-green-400">4.1 %</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">Valeur Estimée</p>
+                                <p class="text-sm text-white">228 000 €</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">CRD</p>
+                                <p class="text-sm text-red-400">148 000 €</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCI Familiale -->
+            <div class="glass-panel p-6 rounded-2xl card-hover">
+                <div class="absolute top-4 right-4 w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center spark-ai pulse-gold-subtle" onclick="triggerAiContext('SCI Familiale', 'La SCI (Société Civile Immobilière) permet de détenir de l\'immobilier à plusieurs tout en organisant la transmission. Vous détenez 60% des parts, votre conjoint 40%. Avantage : donation progressive de parts aux enfants sans droits de succession (abattement de 100 000 € par parent par enfant tous les 15 ans).')">
+                    <svg class="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                </div>
+                <h2 class="text-lg font-light text-white mb-5 border-b border-gray-800 pb-2 flex items-center display-font">
+                    <svg class="w-5 h-5 mr-2" style="color:#D97706" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    SCI Familiale — Immeuble de Rapport (Lille)
+                </h2>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <div class="glass-panel-inner p-5 rounded-xl lg:col-span-2">
+                        <h3 class="text-sm font-bold text-white mb-3 uppercase tracking-wide">Répartition des Parts</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-white font-medium">Vous</span>
+                                    <span class="font-bold" style="color:#D97706">60%</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-bar-fill" style="width:60%; background:#D97706"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-white font-medium">Conjoint(e)</span>
+                                    <span class="font-bold" style="color:#E8A317">40%</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-bar-fill" style="width:40%; background:#E8A317"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-panel-inner p-5 rounded-xl flex flex-col justify-center">
+                        <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Valeur Immeuble</p>
+                        <p class="text-2xl font-semibold text-white mt-1 display-font">867 000 €</p>
+                        <p class="text-xs text-gray-500 mt-2 uppercase tracking-wide">CRD SCI</p>
+                        <p class="text-xl font-semibold text-red-400 mt-1">200 000 €</p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-lg border mt-5 text-sm text-gray-300" style="background:rgba(217,119,6,0.05); border-color:rgba(217,119,6,0.2)">
+                    <span class="font-medium" style="color:#D97706">💡 Transmission :</span> Abattement de 100 000 € par parent par enfant tous les 15 ans. Pensez à la donation progressive de parts pour optimiser les droits de succession.
+                </div>
+            </div>
+
+            <!-- Tableau synthétique immo -->
+            <div class="glass-panel p-6 rounded-2xl">
+                <h2 class="text-lg font-light text-white mb-4 border-b border-gray-800 pb-2 display-font">Synthèse du Parc Immobilier</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-xs text-gray-400 uppercase tracking-wide font-semiboldr border-b border-gray-800">
+                                <th class="text-left py-3 pr-4">Bien</th>
+                                <th class="text-right py-3 px-3">Valeur</th>
+                                <th class="text-right py-3 px-3">CRD</th>
+                                <th class="text-right py-3 px-3">Loyer /mois</th>
+                                <th class="text-right py-3 px-3">Rdt Net</th>
+                                <th class="text-right py-3 pl-3">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800/50">
+                            <tr>
+                                <td class="py-3 pr-4 text-white">Studio Lyon 7</td>
+                                <td class="py-3 px-3 text-right">155 000 €</td>
+                                <td class="py-3 px-3 text-right text-red-400">72 000 €</td>
+                                <td class="py-3 px-3 text-right">620 €</td>
+                                <td class="py-3 px-3 text-right text-green-400">4.8%</td>
+                                <td class="py-3 pl-3 text-right"><span class="tag bg-green-500/15 text-green-400 border border-green-500/30">LMNP</span></td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 pr-4 text-white">T2 Bordeaux</td>
+                                <td class="py-3 px-3 text-right">228 000 €</td>
+                                <td class="py-3 px-3 text-right text-red-400">148 000 €</td>
+                                <td class="py-3 px-3 text-right">780 €</td>
+                                <td class="py-3 px-3 text-right text-green-400">4.1%</td>
+                                <td class="py-3 pl-3 text-right"><span class="tag bg-green-500/15 text-green-400 border border-green-500/30">LMNP</span></td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 pr-4 text-white">Immeuble Lille (SCI 60%)</td>
+                                <td class="py-3 px-3 text-right">867 000 €</td>
+                                <td class="py-3 px-3 text-right text-red-400">200 000 €</td>
+                                <td class="py-3 px-3 text-right text-gray-500">—</td>
+                                <td class="py-3 px-3 text-right text-gray-500">—</td>
+                                <td class="py-3 pl-3 text-right"><span class="tag bg-amber-500/15 text-amber-400 border border-amber-500/30">SCI IS</span></td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="border-t-2" style="border-top-color: rgba(217,119,6,0.3)">
+                                <td class="py-3 pr-4 font-bold" style="color:#D97706">Total</td>
+                                <td class="py-3 px-3 text-right font-bold" style="color:#D97706">1 250 000 €</td>
+                                <td class="py-3 px-3 text-right text-red-400">420 000 €</td>
+                                <td class="py-3 px-3 text-right">1 400 €</td>
+                                <td class="py-3 px-3 text-right text-green-400">4.5%</td>
+                                <td class="py-3 pl-3 text-right"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- AI Chat FAB -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <div id="ai-chat-panel" class="hidden mb-4 w-[90vw] md:w-96 glass-panel rounded-2xl border border-gold/40 overflow-hidden slide-up flex flex-col h-96">
+            <div class="p-4 border-b border-gray-800 bg-black/60 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 rounded-full bg-gold pulse-gold-subtle"></div>
+                    <h3 class="font-medium text-white text-sm" id="ai-chat-title">Assistant Aura IA</h3>
+                </div>
+                <button onclick="toggleAi()" class="text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="flex-1 p-4 overflow-y-auto space-y-4 text-sm" id="chat-messages">
+                <div class="flex items-start space-x-2">
+                    <div class="w-6 h-6 rounded-full bg-gold/20 flex-shrink-0 flex items-center justify-center border border-gold/50"><span class="text-xs text-gold font-bold">IA</span></div>
+                    <div class="bg-black/50 p-3 rounded-xl rounded-tl-none border border-gray-800 text-gray-300" id="ai-context-message">
+                        Bonjour. Le Tableau de Bord a été mis à jour avec vos indicateurs patrimoniaux. Cliquez sur une ✦ étincelle dorée pour analyser une métrique spécifique.
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 border-t border-gray-800 bg-black/40">
+                <div class="flex items-center bg-black/50 border border-gray-700 rounded-full px-4 py-2">
+                    <input type="text" placeholder="Posez une question à l'IA..." class="bg-transparent flex-1 text-xs text-white outline-none placeholder-gray-500">
+                    <button class="text-gold ml-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></button>
+                </div>
+            </div>
+        </div>
+        <button onclick="toggleAi()" class="w-14 h-14 rounded-full bg-gold-gradient text-black flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:scale-110 transition-transform pulse-gold-subtle">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+        </button>
+    </div>
+
+    <!-- Footer Lexique -->
+    <div class="fixed bottom-0 w-full bg-black/80 border-t border-gray-800 p-2.5 text-center text-xs text-gray-400 backdrop-blur-md z-40 hidden md:block">
+        <span class="font-bold text-gray-300">Lexique :</span> 
+        <strong>Patrimoine Brut</strong> = Valeur totale des actifs |
+        <strong>Patrimoine Net</strong> = Brut − CRD |
+        <strong>Valeur Vénale</strong> = Prix de vente estimé |
+        <strong>TMI</strong> = Tranche Marginale d'Imposition |
+        <strong>HCSF</strong> = 35% d'endettement max (assurance incluse) |
+        <strong>PS</strong> = 17.2% (CSG/CRDS) |
+        <strong>IFI</strong> = Seuil 1.3M€ immo net
+    </div>
+
+    <script>
+        // Date
+        document.getElementById('last-update').textContent = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+        // Mobile Menu
+        let mobileMenuOpen = false;
+        function toggleMobileMenu() {
+            mobileMenuOpen = !mobileMenuOpen;
+            const nav = document.getElementById('mobile-nav');
+            const b1 = document.getElementById('burger-1');
+            const b2 = document.getElementById('burger-2');
+            const b3 = document.getElementById('burger-3');
+            
+            if (mobileMenuOpen) {
+                nav.classList.remove('hidden');
+                b1.style.transform = 'rotate(45deg) translate(3px, 3px)';
+                b2.style.opacity = '0';
+                b3.style.transform = 'rotate(-45deg) translate(3px, -3px)';
+            } else {
+                nav.classList.add('hidden');
+                b1.style.transform = '';
+                b2.style.opacity = '1';
+                b3.style.transform = '';
+            }
+        }
+
+        // Navigation
+        const views = ['home', 'finance', 'bourse', 'immo'];
+        const tabColors = { home: 'var(--tab-home)', finance: 'var(--tab-finance)', bourse: 'var(--tab-bourse)', immo: 'var(--tab-immo)' };
+
+        function navigateTo(targetView) {
+            views.forEach(view => {
+                const btn = document.getElementById('nav-' + view);
+                const btnM = document.getElementById('nav-' + view + '-m');
+                const container = document.getElementById('view-' + view);
+                
+                if (view === targetView) {
+                    if(btn) { btn.classList.add('active'); btn.classList.remove('text-gray-400'); }
+                    if(btnM) { btnM.classList.add('bg-gold/5'); btnM.classList.remove('text-gray-400'); btnM.style.color = tabColors[view]; }
+                    if(container) { container.classList.remove('hidden'); container.classList.add('fade-in'); }
+                } else {
+                    if(btn) { btn.classList.add('text-gray-400'); btn.classList.remove('active', 'text-gold'); btn.style.color = ''; }
+                    if(btnM) { btnM.classList.remove('bg-gold/5'); btnM.classList.add('text-gray-400'); btnM.style.color = ''; }
+                    if(container) { container.classList.add('hidden'); container.classList.remove('fade-in'); }
+                }
+            });
+            document.querySelector('.overflow-y-auto').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // AI Chat
+        function toggleAi() {
+            document.getElementById('ai-chat-panel').classList.toggle('hidden');
+        }
+
+        function triggerAiContext(subject, explanation) {
+            const panel = document.getElementById('ai-chat-panel');
+            const messageEl = document.getElementById('ai-context-message');
+            const titleEl = document.getElementById('ai-chat-title');
+            
+            if (panel.classList.contains('hidden')) panel.classList.remove('hidden');
+            
+            titleEl.textContent = "IA — Focus : " + subject;
+            messageEl.innerHTML = '<span class="animate-pulse text-gold">Analyse en cours…</span>';
+            
+            setTimeout(() => { messageEl.textContent = explanation; }, 600);
+        }
+
+        // WebGL Particles
+        const container = document.getElementById('webgl-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x030303);
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+        camera.position.z = 120;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        function createDotTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 32; canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            const g = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+            g.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            g.addColorStop(0.2, 'rgba(212, 175, 55, 0.8)');
+            g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, 32, 32);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const count = 800;
+        const geo = new THREE.BufferGeometry();
+        const pos = new Float32Array(count * 3);
+        for (let i = 0; i < count * 3; i++) pos[i] = (Math.random() - 0.5) * 350;
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+
+        const mat = new THREE.PointsMaterial({ size: 2.5, map: createDotTexture(), transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true });
+        const particles = new THREE.Points(geo, mat);
+        scene.add(particles);
+
+        let mX = 0, mY = 0;
+        document.addEventListener('mousemove', e => { mX = (e.clientX - innerWidth/2); mY = (e.clientY - innerHeight/2); });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            particles.rotation.y += 0.0004;
+            particles.rotation.x += 0.0002;
+            particles.rotation.y += 0.04 * (mX * 0.0005 - particles.rotation.y);
+            particles.rotation.x += 0.04 * (mY * 0.0005 - particles.rotation.x);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = innerWidth / innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(innerWidth, innerHeight);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2057 @@
+{
+  "project": "Aura Wealth",
+  "version": "2.0",
+  "generated": "2026-03-04",
+  "methodology": "UI-First → Interactive Multi-Tenant",
+  "meta": {
+    "priorities": {
+      "P0": "Critique — Infrastructure requise pour toutes les features suivantes.",
+      "P1": "Important — Fonctionnalités coeur (saisie, upload, personnalisation).",
+      "P2": "Nice to have — Parsing avancé, wizard, onboarding.",
+      "P3": "Futur — Alertes intelligentes, intégrations tierces."
+    },
+    "statuses": {
+      "pending": "Non commencé",
+      "wip": "En cours de développement",
+      "done": "Terminé et validé"
+    },
+    "product_versions": {
+      "MVP0": "Squelette technique + Tableau de Bord mocké complet",
+      "MVP1": "Toutes les vues mockées (Épargne, Bourse, Immo, PE) + UX améliorée",
+      "Pilote": "IA mockée + Responsive + Polish pixel-perfect",
+      "Release": "Build statique déployable, QA validée, prêt démo client",
+      "MVP2": "Auth multi-tenant + composants UI interactifs",
+      "MVP3": "Saisie complète des données patrimoniales + CRUD API",
+      "MVP4": "Upload documents + parsing + personnalisation affichage",
+      "MVP5": "Onboarding + recalculs automatiques + alertes"
+    }
+  },
+  "sprints": [
+    {
+      "id": "S1",
+      "name": "Squelette & Tableau de Bord",
+      "duration": "1 semaine",
+      "product_version": "MVP0",
+      "deliverable": "Page Home 100% fidèle maquette + navigation fonctionnelle"
+    },
+    {
+      "id": "S2",
+      "name": "Épargne + Bourse/Crypto + UX Performances",
+      "duration": "1 semaine",
+      "product_version": "MVP1",
+      "deliverable": "3 onglets supplémentaires mockés + Performance Cards enrichies"
+    },
+    {
+      "id": "S3",
+      "name": "Immobilier + Private Equity",
+      "duration": "1 semaine",
+      "product_version": "MVP1",
+      "deliverable": "5 onglets complets + lexique + PE minimaliste"
+    },
+    {
+      "id": "S4",
+      "name": "IA Mockée + Responsive + Polish",
+      "duration": "1 semaine",
+      "product_version": "Pilote",
+      "deliverable": "App complète mockée, responsive, pixel-perfect, déployable"
+    },
+    {
+      "id": "S5",
+      "name": "Fondations Multi-Tenant + Auth + UI Interactifs",
+      "duration": "1 semaine",
+      "product_version": "MVP2",
+      "deliverable": "Authentification JWT, cloisonnement données par utilisateur, composants UI réutilisables (Modal, ConfirmDialog, Toast, FormField, FileUpload)"
+    },
+    {
+      "id": "S6",
+      "name": "Saisie Intuitive des Valeurs Patrimoniales",
+      "duration": "1 semaine",
+      "product_version": "MVP3",
+      "deliverable": "API CRUD complète avec audit trail, saisie inline Dashboard, formulaires modaux pour chaque domaine (livrets, positions, biens, fonds PE), bouton réinitialisation"
+    },
+    {
+      "id": "S7",
+      "name": "Documents Upload + Parsing + Sections Hide/Show",
+      "duration": "1 semaine",
+      "product_version": "MVP4",
+      "deliverable": "Upload et parsing de documents financiers (relevés bancaires, assurances, bilans), vue diff avant intégration, sections masquables avec préférences persistées"
+    },
+    {
+      "id": "S8",
+      "name": "UX Avancée : Recalculs, Historique, Onboarding",
+      "duration": "1 semaine",
+      "product_version": "MVP5",
+      "deliverable": "Recalcul automatique des KPIs, audit log UI, onboarding first-time user, wizard saisie multi-domaine, alertes patrimoniales"
+    }
+  ],
+  "stories": [
+    {
+      "id": "US-001",
+      "title": "Setup projet technique",
+      "description": "Initialisation Next.js 14+ (App Router) + Tailwind CSS + Three.js. Configuration fonts Google (Cormorant Garamond + DM Sans). ESLint + structure feature-based.",
+      "sprint": "S1",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 3,
+      "dependencies": [],
+      "acceptance_criteria": [
+        "npm run build sans erreur",
+        "Fonts Cormorant Garamond + DM Sans chargées et appliquées",
+        "Tailwind configuré avec les CSS custom properties (--gold, --panel-bg, etc.)",
+        "Structure dossiers : /app, /components, /data, /lib"
+      ]
+    },
+    {
+      "id": "US-002",
+      "title": "Header avec navigation 5 onglets",
+      "description": "Barre header glass-panel avec logo Aura Wealth (étoile dorée + texte tracking-[0.2em]), navigation horizontale desktop (5 boutons nav-btn), hamburger mobile (3 lignes animées). Couleur active par onglet.",
+      "sprint": "S1",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 5,
+      "dependencies": [
+        "US-001"
+      ],
+      "acceptance_criteria": [
+        "Identique maquette : glass-panel rounded-2xl px-5 py-4",
+        "Logo : w-8 h-8 rounded-full bg-gold-gradient + text-lg md:text-2xl",
+        "Nav desktop : hidden md:flex, gap-1 lg:gap-4, nav-btn::after underline animé",
+        "Couleurs actives : Home=#D4AF37, Épargne=#10B981, Bourse=#3B82F6, Immo=#D97706, PE=#8B5CF6",
+        "Hamburger mobile : 3 spans w-5 h-0.5, animation rotate 45/-45 + opacity 0",
+        "Menu mobile slide-up glass-panel rounded-xl mt-2 p-3"
+      ]
+    },
+    {
+      "id": "US-003",
+      "title": "Fond WebGL particules dorées (Three.js)",
+      "description": "Canvas Three.js plein écran en background fixe. 800 particules dorées avec AdditiveBlending, texture radial gradient (blanc→or→transparent), interactivité souris (rotation lerp).",
+      "sprint": "S1",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 5,
+      "dependencies": [
+        "US-001"
+      ],
+      "acceptance_criteria": [
+        "800 particules, size 2.5, spread 350, opacity 0.4",
+        "Scene background 0x030303",
+        "Rotation auto : y += 0.0004, x += 0.0002",
+        "Mouse follow : lerp × 0.04",
+        "Performance > 30fps sur iPhone 12+",
+        "Pixel ratio capé à min(devicePixelRatio, 2)",
+        "Resize handler fonctionnel"
+      ]
+    },
+    {
+      "id": "US-004",
+      "title": "Ligne date « Dernière mise à jour »",
+      "description": "Ligne sous le header avec icône horloge (w-3.5 h-3.5 text-gray-600) et date formatée FR (toLocaleDateString fr-FR).",
+      "sprint": "S1",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 1,
+      "dependencies": [
+        "US-002"
+      ],
+      "acceptance_criteria": [
+        "Position : flex justify-end py-3 px-1",
+        "Format : '3 mars 2026 à 14:30'",
+        "Texte text-xs text-gray-500, date en text-gray-300"
+      ]
+    },
+    {
+      "id": "US-005",
+      "title": "KPI Row : Patrimoine Brut + Net + Projection 10 ans",
+      "description": "3 cartes glass-panel en grille 1→3 colonnes. Chiffres display-font text-4xl. Patrimoine Net avec fond gradient or. Sparkle IA sur chaque carte. Variation % colorée.",
+      "sprint": "S1",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 5,
+      "dependencies": [
+        "US-001",
+        "US-003"
+      ],
+      "acceptance_criteria": [
+        "grid-cols-1 md:grid-cols-3 gap-5 stagger",
+        "Carte Brut : border-t-2 border-t-gold/50, 1 465 800 €, ▲ +3.2%",
+        "Carte Net : bg-gradient-to-br from-black/40 to-[#D4AF37]/10, text-gold, 1 045 800 €",
+        "Carte Projection : border-t-2 border-t-blue-500/50, text-blue-400, 1 785 000 €",
+        "Sparkle IA absolute top-3 right-3 w-6 h-6 pulse-gold-subtle",
+        "Labels : text-sm font-bold tracking-widest uppercase"
+      ]
+    },
+    {
+      "id": "US-006",
+      "title": "Barre de répartition patrimoniale",
+      "description": "Barre horizontale segmentée (flex rounded-full h-3) avec 6 segments colorés (Immo, PEA, Crypto, Épargne, Liquidités, PE). Tooltip au survol de chaque segment. Légende pastilles.",
+      "sprint": "S1",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 3,
+      "dependencies": [
+        "US-005"
+      ],
+      "acceptance_criteria": [
+        "glass-panel p-5 rounded-2xl",
+        "Barre : flex rounded-full overflow-hidden h-3 bg-black/40",
+        "Segments : amber-600 (85.3%), blue-500 (5.7%), purple-500 (2.2%), green-500 (5.9%), gray-400 (0.9%)",
+        "Tooltip : fond rgba(0,0,0,0.9), border gold/30, padding 8px 12px, border-radius 8px",
+        "Légende : flex flex-wrap gap-x-5 gap-y-1 mt-3, pastilles w-2 h-2 rounded-full"
+      ]
+    },
+    {
+      "id": "US-007",
+      "title": "Bloc Trésorerie & Épargne Disponible",
+      "description": "Panel glass-panel avec titre icône carte + lignes glass-panel-inner pour Comptes Courants et Épargne de Précaution. Glow-line séparateur. Tag taux d'épargne.",
+      "sprint": "S1",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 3,
+      "dependencies": [
+        "US-001"
+      ],
+      "acceptance_criteria": [
+        "glass-panel p-6 rounded-2xl relative card-hover",
+        "Titre : text-lg font-light display-font, icône w-5 h-5 mr-2 text-gold, border-b border-gray-800 pb-2",
+        "Lignes : glass-panel-inner p-3 rounded-lg, space-y-3",
+        "Comptes Courants : 12 450 €, sous-label 'LCL, Boursorama'",
+        "Épargne Précaution : 34 950 €, sous-label 'Livret A, LDDS'",
+        "Tag : bg-green-500/15 text-green-400 border border-green-500/30, '22% — Excellent'",
+        "Sparkle IA absolute top-4 right-4"
+      ]
+    },
+    {
+      "id": "US-008",
+      "title": "Bloc Endettement & Levier Bancaire",
+      "description": "Panel avec border-l-4 bleu. Grille 2 cols : CRD (420 000 €) + Taux endettement (24.5%) avec progress-bar. Encadré capacité d'emprunt résiduelle.",
+      "sprint": "S1",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 3,
+      "dependencies": [
+        "US-001"
+      ],
+      "acceptance_criteria": [
+        "border-l-4 border-l-blue-500/50",
+        "grid-cols-2 gap-3 pour CRD + taux",
+        "Progress bar : height 6px, border-radius 3px, fill bg-blue-500 width 70%",
+        "Mention 'Max HCSF : 35%' en text-xs text-gray-500",
+        "Encadré : bg-blue-900/10 p-3 rounded-lg border border-blue-500/30",
+        "Capacité résiduelle : ~ 150 000 € en text-lg font-bold text-blue-400"
+      ]
+    },
+    {
+      "id": "US-009",
+      "title": "Bloc Moteur Immobilier (revenus locatifs)",
+      "description": "Panel avec icône maison verte. Revenus locatifs annuels bruts (16 800 €) en text-3xl display-font. Sous-bloc glass-panel-inner avec mensualités crédits et cash-flow net.",
+      "sprint": "S1",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 3,
+      "dependencies": [
+        "US-001"
+      ],
+      "acceptance_criteria": [
+        "Titre avec icône text-green-400",
+        "16 800 € en text-3xl font-semibold display-font + '1 400 € / mois'",
+        "Mensualités : - 13 200 € / an en text-red-400",
+        "Glow-line séparateur",
+        "Cash-Flow Net : + 850 € / mois en text-green-400 text-lg font-bold"
+      ]
+    },
+    {
+      "id": "US-010",
+      "title": "Bloc Moniteur Fiscal complet",
+      "description": "Panel avec border-l-4 rouge. Sélecteur TMI (4 pills : 11/30/41/45%, 30% actif). Lignes IR, PS, TF, IFI. Total annuel en encadré rouge. Simulation PER en encadré or.",
+      "sprint": "S1",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 5,
+      "dependencies": [
+        "US-001"
+      ],
+      "acceptance_criteria": [
+        "border-l-4 border-l-red-500/50",
+        "TMI selector : flex gap-1, pill actif bg-gold/20 text-gold border-gold/50 font-bold",
+        "Lignes : flex justify-between, IR 12 500 €, PS 1 200 €, TF 2 800 €",
+        "IFI : tag vert 'Exonéré (< 1.3M€)'",
+        "Total : bg-red-900/20 p-3 border-red-500/30, 16 500 € en text-xl font-bold text-red-400",
+        "PER : bg-gold/5 p-3 border-gold/20, 3 000 € en text-lg font-bold text-gold"
+      ]
+    },
+    {
+      "id": "US-011",
+      "title": "Dernières Opérations (4 lignes mockées)",
+      "description": "Panel avec 4 lignes glass-panel-inner en stagger animation. Chaque ligne : icône (vert=entrant, rouge=sortant, bleu=transfert) + label + date + montant coloré.",
+      "sprint": "S1",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 3,
+      "dependencies": [
+        "US-001"
+      ],
+      "acceptance_criteria": [
+        "4 lignes : Salaire +4 500€, EDF -120€, Restaurant -85€, Virement PEA -500€",
+        "Icônes : w-8 h-8 rounded-full bg-[color]-500/15, flèches w-4 h-4",
+        "Dates : text-xs text-gray-500",
+        "Montants : font-semibold, vert/rouge/bleu selon type",
+        "Animation stagger delays 0.05s × index"
+      ]
+    },
+    {
+      "id": "US-012",
+      "title": "Ajout : Rendement global pondéré en KPI",
+      "description": "Nouvelle carte ou indicateur intégré au dashboard affichant le rendement moyen pondéré de l'ensemble du patrimoine.",
+      "sprint": "S1",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 2,
+      "dependencies": [
+        "US-005"
+      ],
+      "acceptance_criteria": [
+        "Rendement affiché avec double format : % + €",
+        "Couleur contextuelle vert/rouge",
+        "Cohérent avec le design des KPI existants"
+      ]
+    },
+    {
+      "id": "US-013",
+      "title": "Ajout : Score de diversification (1-10)",
+      "description": "Jauge visuelle (progress-bar ou cercle) indiquant un score de diversification patrimoniale basé sur la répartition entre classes d'actifs.",
+      "sprint": "S1",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 2,
+      "dependencies": [
+        "US-006"
+      ],
+      "acceptance_criteria": [
+        "Score affiché de 1 à 10",
+        "Jauge visuelle (progress-bar ou demi-cercle)",
+        "Tooltip expliquant le calcul",
+        "Intégré sous ou à côté de la barre de répartition"
+      ]
+    },
+    {
+      "id": "US-014",
+      "title": "Ajout : Ratio liquidités / patrimoine",
+      "description": "Petit indicateur sous le bloc trésorerie montrant le ratio actifs liquides / patrimoine total.",
+      "sprint": "S1",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP0",
+      "points": 1,
+      "dependencies": [
+        "US-007"
+      ],
+      "acceptance_criteria": [
+        "Affichage en % avec contexte (3-6 mois de charges recommandés)",
+        "Position : sous le bloc trésorerie ou intégré dans le footer du panel"
+      ]
+    },
+    {
+      "id": "US-020",
+      "title": "Page Épargne : KPI row (3 cartes)",
+      "description": "3 cartes KPI : Épargne Totale (86 350 €), Effort d'Épargne Mensuel (1 500 €), Prévoyance Capital Décès (150 000 €). Border-top vert.",
+      "sprint": "S2",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-002",
+        "US-005"
+      ],
+      "acceptance_criteria": [
+        "grid-cols-1 md:grid-cols-3 gap-5 stagger",
+        "border-top-color: rgba(16,185,129,0.5)",
+        "Effort mensuel : couleur accent #10B981",
+        "Prévoyance : text-purple-300",
+        "Structure identique aux KPI Home"
+      ]
+    },
+    {
+      "id": "US-021",
+      "title": "Bloc Livrets (Livret A + LDDS + jauges)",
+      "description": "Panel avec lignes Livret A (22 950 € / plein) et LDDS (12 000 € / plein). Taux, plafonds, tags 'Plein' ambre. Total livrets réglementés.",
+      "sprint": "S2",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-020"
+      ],
+      "acceptance_criteria": [
+        "Icône cadenas text-green-500",
+        "Chaque livret : glass-panel-inner p-4, taux 2.4%, plafond",
+        "Tag 'Plein' : bg-amber-500/15 text-amber-400 border-amber-500/30",
+        "Glow-line + total 34 950 € en text-lg font-bold"
+      ]
+    },
+    {
+      "id": "US-022",
+      "title": "Bloc Retraite (PER + PERCOL + astuce fiscale)",
+      "description": "Panel border-l-4 vert. PER Individuel (45 100 €) avec sparkle IA + PERCOL (18 300 €). Total retraite. Encadré conseil PER/IR.",
+      "sprint": "S2",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-020"
+      ],
+      "acceptance_criteria": [
+        "border-l-4 rgba(16,185,129,0.5)",
+        "PER : sparkle IA avec explication déductibilité",
+        "PERCOL : mention abondement employeur",
+        "Total : 63 400 € en accent #10B981",
+        "Encadré : bg rgba(16,185,129,0.05), '💡 Astuce : Versez 10 000€ en PER...'"
+      ]
+    },
+    {
+      "id": "US-023",
+      "title": "Bloc Prévoyance (Capital Décès + Assurance + PNO)",
+      "description": "Panel avec grille 3 colonnes : Capital Décès (150 000 €), Assurance Emprunteur (420 000 €), RC PNO (Active).",
+      "sprint": "S2",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 2,
+      "dependencies": [
+        "US-020"
+      ],
+      "acceptance_criteria": [
+        "grid-cols-1 md:grid-cols-3 gap-4",
+        "Cartes glass-panel-inner p-4 text-center",
+        "Capital Décès en text-purple-300",
+        "PNO : '✓ Active' en text-green-400"
+      ]
+    },
+    {
+      "id": "US-024",
+      "title": "Ajout : Bloc Assurance Vie (fonds € + UC)",
+      "description": "Nouveau bloc pour l'assurance vie avec solde total, répartition fonds euros / UC visualisée (mini barre), rendement.",
+      "sprint": "S2",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-021"
+      ],
+      "acceptance_criteria": [
+        "Solde : 42 000 € mocké",
+        "Répartition : progress-bar fonds euros vs UC",
+        "Rendement annuel affiché",
+        "Style cohérent avec les autres blocs épargne"
+      ]
+    },
+    {
+      "id": "US-025",
+      "title": "Ajout : Lignes PEL/CEL si pertinent",
+      "description": "Lignes optionnelles dans le bloc livrets pour PEL et CEL avec taux et solde.",
+      "sprint": "S2",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 1,
+      "dependencies": [
+        "US-021"
+      ],
+      "acceptance_criteria": [
+        "Même structure que Livret A / LDDS",
+        "Affichage conditionnel (si données présentes)"
+      ]
+    },
+    {
+      "id": "US-030",
+      "title": "Page Bourse : KPI row (3 cartes)",
+      "description": "3 cartes KPI : Actifs Financiers (117 000 €), PEA (84 200 €), Crypto (32 800 €). Border-top bleu. Perf YTD colorée.",
+      "sprint": "S2",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-002",
+        "US-005"
+      ],
+      "acceptance_criteria": [
+        "border-top-color : rgba(59,130,246,0.5)",
+        "PEA : couleur accent #3B82F6, +12.4% YTD en text-green-400/80",
+        "Crypto : text-purple-300 / text-purple-400, +28.7% YTD",
+        "Structure stagger identique aux KPI Home"
+      ]
+    },
+    {
+      "id": "US-031",
+      "title": "Grille PEA : 4 positions mockées",
+      "description": "Panel avec grille 2 colonnes de 4 cartes : ETF MSCI World, ETF S&P 500, Actions Individuelles, Liquidités PEA. Chaque carte : nom + tag + montant + % du PEA + perf + progress-bar.",
+      "sprint": "S2",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 5,
+      "dependencies": [
+        "US-030"
+      ],
+      "acceptance_criteria": [
+        "grid-cols-1 md:grid-cols-2 gap-3",
+        "Tags : ETF (bg-blue-500/15), Stock (bg-amber-500/15), Cash (bg-gray-500/15)",
+        "Progress bars avec width correspondant au % du PEA",
+        "Perf colorée : vert si +, rouge si -",
+        "Footer : versement restant 65 800 € (plafond 150 000 €)"
+      ]
+    },
+    {
+      "id": "US-032",
+      "title": "Amélioration : Performance Card (double affichage € + %)",
+      "description": "Chaque position affiche la performance en montant (€) ET en pourcentage. Ex : '+5 240€ (+12.4%)' au lieu de juste '+12.4%'.",
+      "sprint": "S2",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-031"
+      ],
+      "acceptance_criteria": [
+        "Format : '+X XXX € (+Y.Y%)' ou '-X XXX € (-Y.Y%)'",
+        "Couleur vert si positif, rouge si négatif",
+        "Appliqué à toutes les positions PEA et Crypto"
+      ]
+    },
+    {
+      "id": "US-033",
+      "title": "Amélioration : Sparklines (mini-graphes) par position",
+      "description": "SVG inline sur chaque carte de position montrant la tendance 30 jours. Couleur contextuelle (vert si tendance haussière, rouge si baissière).",
+      "sprint": "S2",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 5,
+      "dependencies": [
+        "US-031"
+      ],
+      "acceptance_criteria": [
+        "SVG inline, largeur ~80px, hauteur ~24px",
+        "Données mockées : 30 points aléatoires avec tendance cohérente",
+        "Stroke couleur vert ou rouge selon direction",
+        "Fill gradient léger sous la ligne",
+        "Pas d'axes, pas de labels — juste la courbe"
+      ]
+    },
+    {
+      "id": "US-034",
+      "title": "Amélioration : Tooltip pédagogique sur performances",
+      "description": "Au survol d'un chiffre de performance, bulle tooltip en langage naturel : 'Vous avez gagné X€ depuis le 1er janvier'.",
+      "sprint": "S2",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-032"
+      ],
+      "acceptance_criteria": [
+        "Style tooltip identique au tooltip-wrapper de la maquette",
+        "Texte en français courant, pas de jargon",
+        "Exemples : 'Vous avez gagné 5 240 € sur cet ETF depuis janvier'",
+        "Transition opacity 0.2s ease"
+      ]
+    },
+    {
+      "id": "US-035",
+      "title": "Amélioration : Sélecteur de période (7j/1m/3m/YTD/1an)",
+      "description": "Toggle pills pour changer la période d'affichage des performances. Défaut : YTD. Les données mockées changent selon la sélection.",
+      "sprint": "S2",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-031"
+      ],
+      "acceptance_criteria": [
+        "Pills style similaire au TMI selector (rounded-full, border)",
+        "Pill actif : bg-blue-500/20 text-blue-400 border-blue-500/50",
+        "5 options : 7j, 1m, 3m, YTD, 1an",
+        "Données mockées différentes par période",
+        "Position : sous le titre de la section Bourse"
+      ]
+    },
+    {
+      "id": "US-036",
+      "title": "Grille Crypto : BTC + ETH + Altcoins",
+      "description": "Panel avec grille 3 colonnes : Bitcoin, Ethereum, Altcoins divers. Icônes colorées (₿, Ξ, ◆). Plateformes en légende. Rappel fiscal flat tax.",
+      "sprint": "S2",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-030"
+      ],
+      "acceptance_criteria": [
+        "grid-cols-1 md:grid-cols-3 gap-3",
+        "BTC : w-6 h-6 bg-orange-500/20 text-orange-400, 18 500 €, +42.1%",
+        "ETH : bg-blue-500/20 text-blue-400, 10 200 €, +18.3%",
+        "Alts : bg-gray-500/20, 4 100 €, -8.2%",
+        "Plateformes : Binance, Ledger, Coinbase en légende",
+        "Encadré : '⚠️ Rappel fiscal : Flat tax 30%...'"
+      ]
+    },
+    {
+      "id": "US-037",
+      "title": "Ajout : Section CTO (Compte-Titres Ordinaire)",
+      "description": "Nouveau bloc similaire au PEA pour les titres hors enveloppe fiscale. Mention de la fiscalité différente (flat tax 30% ou barème IR).",
+      "sprint": "S2",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-031"
+      ],
+      "acceptance_criteria": [
+        "Structure identique au bloc PEA",
+        "Mention 'Flat tax 30% ou option barème IR'",
+        "Données mockées : 2-3 positions (actions US, REIT, etc.)"
+      ]
+    },
+    {
+      "id": "US-038",
+      "title": "Ajout : PEA-PME (plafond 225 000 €)",
+      "description": "Section optionnelle PEA-PME avec plafond spécifique et positions mockées.",
+      "sprint": "S2",
+      "priority": "P2",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 2,
+      "dependencies": [
+        "US-031"
+      ],
+      "acceptance_criteria": [
+        "Même structure que PEA",
+        "Plafond 225 000 € mentionné",
+        "Affichage conditionnel"
+      ]
+    },
+    {
+      "id": "US-039",
+      "title": "Ajout : Plus-values latentes PEA + régime fiscal 5 ans",
+      "description": "Encadré récapitulatif des plus-values latentes dans le PEA avec rappel du régime fiscal après 5 ans de détention.",
+      "sprint": "S2",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 2,
+      "dependencies": [
+        "US-031"
+      ],
+      "acceptance_criteria": [
+        "PV latentes totales en € et %",
+        "Rappel : 'Après 5 ans : exonération IR, seuls PS 17.2% applicables'",
+        "Style encadré info bleu (bg-blue/5, border-blue/20)"
+      ]
+    },
+    {
+      "id": "US-040",
+      "title": "Info versement PEA restant + plafond",
+      "description": "Barre d'information en bas du bloc PEA indiquant le montant de versement restant autorisé.",
+      "sprint": "S2",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 1,
+      "dependencies": [
+        "US-031"
+      ],
+      "acceptance_criteria": [
+        "p-3 rounded-lg border bg-blue/5 border-blue/20",
+        "Texte : 'Versement PEA restant autorisé : 65 800 € (plafond 150 000 €)'",
+        "65 800 € en font-bold text-blue-400"
+      ]
+    },
+    {
+      "id": "US-050",
+      "title": "Page Immo : KPI row (4 cartes)",
+      "description": "4 cartes KPI : Valeur Vénale (1 250 000 €), CRD total (420 000 €), Cash-Flow Net (+850 €/mois), Rendement moyen (4.5%). Border-top ambre.",
+      "sprint": "S3",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-002",
+        "US-005"
+      ],
+      "acceptance_criteria": [
+        "grid-cols-1 md:grid-cols-4 gap-5",
+        "Valeur Vénale : color #D97706",
+        "CRD : text-red-400",
+        "Cash-Flow : text-green-400",
+        "Rendement : text-white"
+      ]
+    },
+    {
+      "id": "US-051",
+      "title": "Bloc Parc LMNP (2 biens détaillés)",
+      "description": "Panel avec grille 2 colonnes de fiches immobilières (Studio Lyon 7 + T2 Bordeaux). Chaque fiche : border-l-4 ambre, nom, statut, loyer, rendement, valeur, CRD.",
+      "sprint": "S3",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 5,
+      "dependencies": [
+        "US-050"
+      ],
+      "acceptance_criteria": [
+        "Titre : '2 Biens Actifs' + tag '100% Occupé'",
+        "grid-cols-1 lg:grid-cols-2 gap-5",
+        "Fiches : glass-panel-inner p-5 rounded-xl border-l-4 rgba(217,119,6,0.6)",
+        "Grille interne : grid-cols-2 gap-3",
+        "Tags : 'Loué' en vert, 'Vacant' en rouge si applicable"
+      ]
+    },
+    {
+      "id": "US-052",
+      "title": "Bloc SCI Familiale",
+      "description": "Panel avec répartition des parts (progress bars : Vous 60%, Conjoint 40%). Valeur immeuble (867 000 €), CRD SCI (200 000 €). Conseil transmission.",
+      "sprint": "S3",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 5,
+      "dependencies": [
+        "US-050"
+      ],
+      "acceptance_criteria": [
+        "grid-cols-1 lg:grid-cols-3 gap-5",
+        "Progress bars : 60% couleur #D97706, 40% couleur #E8A317",
+        "Encadré transmission : '💡 Abattement 100 000 € par parent par enfant tous les 15 ans'",
+        "Sparkle IA avec explication SCI"
+      ]
+    },
+    {
+      "id": "US-053",
+      "title": "Tableau synthétique immobilier",
+      "description": "Table HTML complète avec colonnes : Bien, Valeur, CRD, Loyer/mois, Rdt Net, Statut. 3 lignes + ligne Total ambre.",
+      "sprint": "S3",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-051",
+        "US-052"
+      ],
+      "acceptance_criteria": [
+        "Header : text-xs text-gray-400 uppercase tracking-wide border-b border-gray-800",
+        "Body : divide-y divide-gray-800/50",
+        "Tags statut : LMNP (vert), SCI IS (ambre)",
+        "Footer Total : border-t-2 rgba(217,119,6,0.3), couleur #D97706"
+      ]
+    },
+    {
+      "id": "US-054",
+      "title": "Ajout : Ligne Résidence Principale dans synthèse",
+      "description": "Ajout d'une ligne dans le tableau synthétique pour la résidence principale avec valeur estimée et CRD.",
+      "sprint": "S3",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 1,
+      "dependencies": [
+        "US-053"
+      ],
+      "acceptance_criteria": [
+        "Nouvelle ligne dans le tableau",
+        "Colonnes Loyer et Rdt : '—' (non locatif)",
+        "Tag statut : 'RP' en gris"
+      ]
+    },
+    {
+      "id": "US-055",
+      "title": "Ajout : Section SCPI",
+      "description": "Bloc optionnel pour les parts de SCPI avec rendement et liquidité.",
+      "sprint": "S3",
+      "priority": "P2",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 2,
+      "dependencies": [
+        "US-050"
+      ],
+      "acceptance_criteria": [
+        "Nom SCPI, nombre de parts, valorisation, rendement annuel",
+        "Mention liquidité (délai de revente)",
+        "Style cohérent avec les fiches LMNP"
+      ]
+    },
+    {
+      "id": "US-056",
+      "title": "Ajout : Indicateur taux d'occupation global",
+      "description": "Indicateur visuel du % de biens occupés vs vacants avec alerte si < 90%.",
+      "sprint": "S3",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 2,
+      "dependencies": [
+        "US-051"
+      ],
+      "acceptance_criteria": [
+        "Affichage en % avec pastille couleur",
+        "Vert si >= 90%, ambre si 70-89%, rouge si < 70%",
+        "Intégré au titre du bloc LMNP ou en KPI additionnel"
+      ]
+    },
+    {
+      "id": "US-057",
+      "title": "Ajout : Amortissement LMNP restant",
+      "description": "Durée restante d'amortissement comptable affichée sur chaque fiche LMNP.",
+      "sprint": "S3",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 1,
+      "dependencies": [
+        "US-051"
+      ],
+      "acceptance_criteria": [
+        "Ligne supplémentaire dans chaque fiche LMNP",
+        "Format : 'Amortissement restant : X ans'",
+        "Style text-xs text-gray-500"
+      ]
+    },
+    {
+      "id": "US-058",
+      "title": "Ajout : Assurances immo (PNO, GLI, MRH)",
+      "description": "Section récapitulative des assurances immobilières avec statuts actif/inactif.",
+      "sprint": "S3",
+      "priority": "P2",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 2,
+      "dependencies": [
+        "US-051"
+      ],
+      "acceptance_criteria": [
+        "Grille ou liste : PNO, GLI, MRH",
+        "Chaque item : nom + statut (✓ Active / ✗ Inactive)",
+        "Couleurs : vert actif, rouge inactif"
+      ]
+    },
+    {
+      "id": "US-060",
+      "title": "Nouvel onglet Private Equity : KPI (3 cartes)",
+      "description": "3 cartes KPI PE : Total Investi (25 000 €), Valorisation Estimée (26 150 €), Multiple TVPI (1.05x). Border-top violet #8B5CF6.",
+      "sprint": "S3",
+      "priority": "P2",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-002",
+        "US-005"
+      ],
+      "acceptance_criteria": [
+        "grid-cols-1 md:grid-cols-3 gap-5",
+        "border-top-color : rgba(139,92,246,0.5)",
+        "Couleur accent : #8B5CF6",
+        "TVPI en text-3xl display-font",
+        "Navigation onglet PE fonctionnelle"
+      ]
+    },
+    {
+      "id": "US-061",
+      "title": "PE : Liste investissements (tableau simple)",
+      "description": "Tableau simple avec colonnes : Investissement, Date, Montant Investi, Valorisation, Statut. 4 lignes mockées.",
+      "sprint": "S3",
+      "priority": "P2",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-060"
+      ],
+      "acceptance_criteria": [
+        "4 lignes mockées : Tikehau, FoodTech, FCPI Innovation, Club Deal",
+        "Structure table identique au tableau synth immo",
+        "Colonnes alignées, montants formatés",
+        "Header text-xs uppercase tracking-wide"
+      ]
+    },
+    {
+      "id": "US-062",
+      "title": "PE : Tags de statut colorés",
+      "description": "Tags visuels sur chaque investissement PE : 'En cours' (ambre), 'Exit' (vert), 'Write-off' (rouge).",
+      "sprint": "S3",
+      "priority": "P2",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 1,
+      "dependencies": [
+        "US-061"
+      ],
+      "acceptance_criteria": [
+        "En cours : bg-amber-500/15 text-amber-400 border-amber-500/30",
+        "Exit : bg-green-500/15 text-green-400 border-green-500/30",
+        "Write-off : bg-red-500/15 text-red-400 border-red-500/30",
+        "Style identique aux tags existants"
+      ]
+    },
+    {
+      "id": "US-063",
+      "title": "PE : Historique appels de fonds / distributions",
+      "description": "Timeline simplifiée par investissement montrant les entrées (appels de fonds) et sorties (distributions).",
+      "sprint": "S3",
+      "priority": "P2",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 3,
+      "dependencies": [
+        "US-061"
+      ],
+      "acceptance_criteria": [
+        "Format timeline vertical simple",
+        "Icônes : flèche entrante (appel), flèche sortante (distribution)",
+        "Dates + montants",
+        "Style glass-panel-inner"
+      ]
+    },
+    {
+      "id": "US-064",
+      "title": "PE : IRR estimé (optionnel)",
+      "description": "Calcul et affichage du taux de rendement interne si les valorisations sont suffisantes.",
+      "sprint": "S3",
+      "priority": "P3",
+      "status": "done",
+      "product_version": "MVP1",
+      "points": 2,
+      "dependencies": [
+        "US-061"
+      ],
+      "acceptance_criteria": [
+        "Affichage conditionnel (seulement si 2+ valorisations)",
+        "Format : 'IRR estimé : X.X%'",
+        "Tooltip expliquant ce qu'est l'IRR"
+      ]
+    },
+    {
+      "id": "US-070",
+      "title": "Panel IA flottant (FAB + chat panel)",
+      "description": "Bouton FAB doré (w-14 h-14 bg-gold-gradient) en bas à droite. Panel chat glassmorphism avec header, zone messages, input bar.",
+      "sprint": "S4",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "Pilote",
+      "points": 5,
+      "dependencies": [
+        "US-001",
+        "US-002"
+      ],
+      "acceptance_criteria": [
+        "FAB : fixed bottom-6 right-6 z-50, w-14 h-14 rounded-full",
+        "FAB : shadow 0 0 20px rgba(212,175,55,0.4), hover scale(1.10)",
+        "Panel : w-[90vw] md:w-96 h-96, glass-panel border-gold/40",
+        "Header : bg-black/60 border-b border-gray-800, badge w-2 h-2 rounded-full bg-gold",
+        "Input : bg-black/50 border border-gray-700 rounded-full px-4 py-2",
+        "Toggle show/hide avec animation slide-up"
+      ]
+    },
+    {
+      "id": "US-071",
+      "title": "Boutons sparkle (✦) sur chaque indicateur",
+      "description": "Boutons étoile dorée sur tous les panels ayant un contexte IA. Au clic, ouvre le panel IA avec le titre et une explication pré-écrite.",
+      "sprint": "S4",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "Pilote",
+      "points": 3,
+      "dependencies": [
+        "US-070",
+        "US-005",
+        "US-007",
+        "US-008",
+        "US-009",
+        "US-010"
+      ],
+      "acceptance_criteria": [
+        "Position : absolute top-3 right-3 (KPI) ou top-4 right-4 (sections)",
+        "Style : w-6 h-6 rounded-full bg-gold/10, icône w-3 h-3 text-gold",
+        "Animation : pulse-gold-subtle 2.5s infinite",
+        "Hover : scale(1.25) rotate(15deg) + drop-shadow gold",
+        "Au clic : ouvre panel IA + change titre + affiche explication"
+      ]
+    },
+    {
+      "id": "US-072",
+      "title": "Réponses IA pré-écrites (mock) pour chaque sparkle",
+      "description": "Au moins 15 textes pédagogiques pré-écrits couvrant : Patrimoine Brut/Net, Projection, Liquidités, Endettement/HCSF, Revenus Locatifs, Fiscal/TMI, PER, PEA, Crypto, LMNP, SCI, PE/TVPI, etc.",
+      "sprint": "S4",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "Pilote",
+      "points": 3,
+      "dependencies": [
+        "US-071"
+      ],
+      "acceptance_criteria": [
+        "Minimum 15 réponses contextuelles",
+        "Langage pédagogique (pas de jargon brut)",
+        "Effet 'Analyse en cours…' pendant 600ms puis affichage",
+        "Titre du panel IA change selon le contexte",
+        "Couvre les 5 onglets"
+      ]
+    },
+    {
+      "id": "US-073",
+      "title": "Barre de lexique footer (desktop)",
+      "description": "Footer fixe en bas avec glossaire inline des termes clés. Visible uniquement sur desktop (hidden md:block).",
+      "sprint": "S4",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "Pilote",
+      "points": 2,
+      "dependencies": [
+        "US-001"
+      ],
+      "acceptance_criteria": [
+        "Position : fixed bottom-0 w-full z-40",
+        "Style : bg-black/80 backdrop-blur-md border-t border-gray-800",
+        "Padding : p-2.5, text-xs text-gray-400 text-center",
+        "Termes en font-bold text-gray-300",
+        "Termes : Patrimoine Brut, Net, Valeur Vénale, TMI, HCSF, PS, IFI, PEA, LMNP, CRD, PER, Flat Tax, TVPI, SCPI"
+      ]
+    },
+    {
+      "id": "US-074",
+      "title": "Responsive mobile complet (toutes pages)",
+      "description": "Validation responsive sur tous les onglets : grilles passent en 1 colonne, nav hamburger, paddings réduits, footer masqué.",
+      "sprint": "S4",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "Pilote",
+      "points": 5,
+      "dependencies": [
+        "US-002",
+        "US-020",
+        "US-030",
+        "US-050",
+        "US-060"
+      ],
+      "acceptance_criteria": [
+        "Mobile (375px) : toutes grilles en 1 col, px-4 py-6",
+        "Tablette (768px) : grilles KPI en 3 cols, nav visible",
+        "Desktop (1280px) : layout complet lg:grid-cols-2",
+        "Tables immo : overflow-x-auto scroll horizontal sur mobile",
+        "Chat panel : w-[90vw] sur mobile"
+      ]
+    },
+    {
+      "id": "US-075",
+      "title": "Animations d'entrée (fadeIn, slideUp, stagger)",
+      "description": "Toutes les animations CSS de la maquette implémentées : fadeIn sur les vues, stagger sur les grilles, slideUp sur menu mobile et panel IA.",
+      "sprint": "S4",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "Pilote",
+      "points": 3,
+      "dependencies": [
+        "US-005",
+        "US-011"
+      ],
+      "acceptance_criteria": [
+        "fadeIn : 0.5s cubic-bezier(0.22,1,0.36,1), translateY 12px→0",
+        "slideUp : 0.35s, translateY 24px→0",
+        "stagger : delays 0.05s × index (max 6 enfants)",
+        "Pas de jank visuel, GPU-accelerated (transform + opacity)"
+      ]
+    },
+    {
+      "id": "US-076",
+      "title": "Hover states (card-hover, tooltip)",
+      "description": "Tous les états de survol : élévation des cartes, glow des bordures, tooltips de la barre de répartition.",
+      "sprint": "S4",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "Pilote",
+      "points": 2,
+      "dependencies": [
+        "US-005",
+        "US-006"
+      ],
+      "acceptance_criteria": [
+        "card-hover : translateY(-2px), box-shadow 0 8px 40px rgba(0,0,0,0.4), border-color gold/40",
+        "Tooltips répartition : opacity 0→1, 0.2s ease",
+        "spark-ai hover : scale(1.25) rotate(15deg) + drop-shadow"
+      ]
+    },
+    {
+      "id": "US-077",
+      "title": "Scrollbar custom (fine, dorée)",
+      "description": "Scrollbar customisée via CSS webkit-scrollbar pour correspondre à la maquette.",
+      "sprint": "S4",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "Pilote",
+      "points": 1,
+      "dependencies": [
+        "US-001"
+      ],
+      "acceptance_criteria": [
+        "Width : 5px",
+        "Track : transparent",
+        "Thumb : rgba(212,175,55,0.2), border-radius 10px",
+        "Thumb hover : rgba(212,175,55,0.5)"
+      ]
+    },
+    {
+      "id": "US-078",
+      "title": "Tab indicator (ligne colorée sous onglets)",
+      "description": "Ligne de 3px avec gradient coloré par onglet affichée en haut de chaque vue.",
+      "sprint": "S4",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "Pilote",
+      "points": 1,
+      "dependencies": [
+        "US-002"
+      ],
+      "acceptance_criteria": [
+        "height 3px, border-radius 2px, margin-bottom 1.5rem, opacity 0.6",
+        "Gradient : linear-gradient(90deg, transparent, [tab-color], transparent)",
+        "Couleur correspond à l'onglet actif"
+      ]
+    },
+    {
+      "id": "US-079",
+      "title": "Ajout : Taux effectif d'imposition",
+      "description": "Ratio charge fiscale totale / revenus bruts totaux, intégré au Moniteur Fiscal.",
+      "sprint": "S4",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "Pilote",
+      "points": 1,
+      "dependencies": [
+        "US-010"
+      ],
+      "acceptance_criteria": [
+        "Ligne supplémentaire dans le Moniteur Fiscal",
+        "Format : 'Taux effectif : X.X%'",
+        "Calcul : total fiscal / revenus bruts"
+      ]
+    },
+    {
+      "id": "US-080",
+      "title": "Ajout : Plafond épargne retraite restant",
+      "description": "Montant restant déductible PER (10% revenus N-1 - versements effectués), intégré au bloc PER.",
+      "sprint": "S4",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "Pilote",
+      "points": 1,
+      "dependencies": [
+        "US-022"
+      ],
+      "acceptance_criteria": [
+        "Format : 'Plafond déductible restant : X XXX €'",
+        "Style encadré info vert",
+        "Position : sous le total retraite ou dans l'encadré existant"
+      ]
+    },
+    {
+      "id": "US-081",
+      "title": "Ajout : Taxe habitation résidence secondaire",
+      "description": "Ligne optionnelle dans le Moniteur Fiscal pour la taxe d'habitation sur résidences secondaires ou logements vacants.",
+      "sprint": "S4",
+      "priority": "P2",
+      "status": "done",
+      "product_version": "Pilote",
+      "points": 1,
+      "dependencies": [
+        "US-010"
+      ],
+      "acceptance_criteria": [
+        "Ligne conditionnelle",
+        "Même style que les autres lignes fiscales",
+        "Ajout au total si présent"
+      ]
+    },
+    {
+      "id": "US-082",
+      "title": "QA visuelle : pixel-perfect vs maquette HTML",
+      "description": "Comparaison screenshot pour screenshot entre l'app développée et la maquette HTML de référence sur les 5 onglets.",
+      "sprint": "S4",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "Release",
+      "points": 5,
+      "dependencies": [
+        "US-074",
+        "US-075",
+        "US-076",
+        "US-078"
+      ],
+      "acceptance_criteria": [
+        "Fidélité visuelle ≥ 95% sur chaque onglet",
+        "Vérification sur 3 viewports : 375px, 768px, 1280px",
+        "Tous les spacings, fonts, couleurs, animations validés",
+        "Aucune régression visuelle",
+        "Screenshots de comparaison archivés"
+      ]
+    },
+    {
+      "id": "US-083",
+      "title": "Export statique démo (build Next.js static)",
+      "description": "Build statique Next.js déployable sur Vercel/Netlify. URL de démo fonctionnelle.",
+      "sprint": "S4",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "Release",
+      "points": 2,
+      "dependencies": [
+        "US-082"
+      ],
+      "acceptance_criteria": [
+        "next build + next export sans erreur",
+        "Déployé sur Vercel avec URL publique",
+        "Toutes les pages fonctionnelles",
+        "WebGL opérationnel en production",
+        "Lighthouse Performance > 80"
+      ]
+    },
+    {
+      "id": "US-100",
+      "title": "Modèle utilisateur + Authentification JWT backend",
+      "description": "Créer le modèle User (Pydantic + MongoDB) avec authentification JWT complète. Inclut register, login, refresh token, profil utilisateur, et middleware de protection des endpoints. Structure User : id (UUID), email (unique), hashed_password (bcrypt), nom, prenom, created_at, last_login, preferences (sections_visibles dict, devise, langue), onboarding_completed. Endpoints : POST /auth/register, POST /auth/login (retourne access + refresh JWT), POST /auth/refresh, GET /auth/me. Middleware get_current_user pour protéger tous les endpoints patrimoniaux. Collection MongoDB 'users' avec index unique sur email.",
+      "sprint": "S5",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP2",
+      "points": 8,
+      "dependencies": [],
+      "acceptance_criteria": [
+        "POST /api/v1/auth/register crée un utilisateur avec email unique et password hashé bcrypt",
+        "POST /api/v1/auth/login retourne un access token JWT (expire 30min) + refresh token (expire 7j)",
+        "POST /api/v1/auth/refresh renouvelle l'access token à partir du refresh token valide",
+        "GET /api/v1/auth/me retourne le profil utilisateur courant (sans hashed_password)",
+        "Middleware get_current_user injecté comme dépendance FastAPI sur tous les endpoints patrimoniaux",
+        "Toute requête sans token valide retourne 401 Unauthorized",
+        "Collection MongoDB 'users' avec index unique sur le champ email",
+        "Passwords hashés avec passlib[bcrypt], jamais stockés en clair"
+      ],
+      "files": {
+        "new": [
+          "backend/app/models/user.py",
+          "backend/app/routers/auth.py",
+          "backend/app/dependencies.py"
+        ],
+        "modified": [
+          "backend/pyproject.toml",
+          "backend/app/config.py"
+        ]
+      }
+    },
+    {
+      "id": "US-101",
+      "title": "Migration données single-tenant vers multi-tenant",
+      "description": "Restructurer MongoDB pour cloisonner les données par utilisateur. Remplacer les 5 collections séparées (dashboard, epargne, bourse, immobilier, private_equity) par une collection unifiée 'patrimoine_data' avec un document par domaine par utilisateur. Structure : {_id, user_id, domain, data: {...}, updated_at}. Index composé unique {user_id, domain}. Ajouter les collections 'documents', 'upload_history', 'audit_log' avec cloisonnement user_id systématique. Migrer le seed pour créer un user demo avec ses 5 documents patrimoniaux. Tous les endpoints GET existants doivent filtrer par current_user.id.",
+      "sprint": "S5",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP2",
+      "points": 8,
+      "dependencies": [
+        "US-100"
+      ],
+      "acceptance_criteria": [
+        "Collection 'patrimoine_data' : un document par domaine par utilisateur (5 domaines x N users)",
+        "Index composé unique {user_id: 1, domain: 1} sur patrimoine_data",
+        "Collections 'documents', 'upload_history', 'audit_log' créées avec indexes {user_id: 1, timestamp: -1}",
+        "Seed crée un user demo (demo@aura.fr / demo1234) avec ses 5 documents patrimoniaux",
+        "Tous les GET endpoints existants filtrent par current_user.id via le middleware",
+        "Un utilisateur ne peut JAMAIS voir ou accéder aux données d'un autre utilisateur",
+        "Test d'isolation : créer 2 users, vérifier qu'aucun ne voit les données de l'autre",
+        "Fallback mock data fonctionne toujours si MongoDB indisponible (mode dev)"
+      ],
+      "files": {
+        "new": [
+          "backend/app/models/patrimoine.py"
+        ],
+        "modified": [
+          "backend/app/data/seed.py",
+          "backend/app/database.py",
+          "backend/app/routers/dashboard.py",
+          "backend/app/routers/epargne.py",
+          "backend/app/routers/bourse.py",
+          "backend/app/routers/immobilier.py",
+          "backend/app/routers/private_equity.py"
+        ]
+      }
+    },
+    {
+      "id": "US-102",
+      "title": "Frontend Auth : pages login/register + AuthContext + route guard",
+      "description": "Créer les pages d'authentification (login + register) avec design glassmorphism cohérent avec l'app. AuthContext gère le token JWT et les infos utilisateur. Le token access est persisté en localStorage, le refresh en mémoire. apiFetch envoie automatiquement le header Authorization: Bearer. ProtectedRoute redirige vers /login si non authentifié. Bouton déconnexion dans le Header. Loading state pendant la vérification initiale du token au démarrage de l'app.",
+      "sprint": "S5",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP2",
+      "points": 5,
+      "dependencies": [
+        "US-100"
+      ],
+      "acceptance_criteria": [
+        "Page /login : formulaire email + mot de passe, design glassmorphism avec fond particules visible",
+        "Page /register : formulaire nom, prénom, email, mot de passe, confirmation mot de passe",
+        "AuthContext expose : user, token, login(), register(), logout(), isAuthenticated, isLoading",
+        "Token JWT access persisté en localStorage, refresh token en mémoire uniquement",
+        "apiFetch envoie automatiquement le header Authorization: Bearer <token> sur chaque requête",
+        "ProtectedRoute : redirige vers /login si non authentifié, affiche children sinon",
+        "Bouton déconnexion (icône logout) dans le Header avec nom de l'utilisateur affiché",
+        "Loading state (spinner ou skeleton) pendant la vérification du token au démarrage"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/context/AuthContext.tsx",
+          "frontend/src/components/auth/LoginPage.tsx",
+          "frontend/src/components/auth/RegisterPage.tsx",
+          "frontend/src/components/auth/ProtectedRoute.tsx"
+        ],
+        "modified": [
+          "frontend/src/api/client.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/components/layout/Header.tsx"
+        ]
+      }
+    },
+    {
+      "id": "US-103",
+      "title": "Composants UI partagés : Modal, ConfirmDialog, Toast, FormField, FileUpload",
+      "description": "Créer les 5 composants UI réutilisables nécessaires pour toute la suite du backlog interactif. Tous les composants suivent le design glassmorphism de l'app (fond semi-transparent, backdrop-blur, bordure dorée). ConfirmDialog : popup modale avec variantes danger/warning/info, animation fadeIn+scale, fermeture sur Escape et clic extérieur. Modal : conteneur plein écran avec header/body/footer, scrollable, responsive. Toast : notification slide-in depuis le haut, auto-dismiss 4s, ToastContext global. FormField : wrapper label+input+erreur avec types text/number/currency(€)/percent(%)/date/select, validation visuelle. FileUpload : zone drag&drop avec preview, barre de progression, types et taille max configurables.",
+      "sprint": "S5",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP2",
+      "points": 5,
+      "dependencies": [],
+      "acceptance_criteria": [
+        "ConfirmDialog : 3 variantes (danger=rouge, warning=amber, info=bleu), titre, message, boutons Annuler/Confirmer",
+        "ConfirmDialog : animation fadeIn + scale(0.95→1), fermeture sur touche Escape et clic sur l'overlay",
+        "Modal : header avec titre + bouton X, body scrollable, footer avec slot actions, plein écran mobile / centré desktop",
+        "Toast : slide-in depuis le haut avec animation, auto-dismiss après 4 secondes, variantes success/error/info",
+        "ToastContext : accessible partout via useToast(), appels toast.success('msg'), toast.error('msg')",
+        "FormField : types text, number, currency (symbole € suffixé), percent (symbole % suffixé), date, select (dropdown)",
+        "FormField : validation visuelle (bordure rouge + message erreur si invalide, bordure verte si valide, dorée au focus)",
+        "FileUpload : zone drag&drop avec hover visuel, bouton 'Parcourir', preview fichier, barre de progression, types et taille max en props"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/components/shared/ConfirmDialog.tsx",
+          "frontend/src/components/shared/Modal.tsx",
+          "frontend/src/components/shared/Toast.tsx",
+          "frontend/src/context/ToastContext.tsx",
+          "frontend/src/components/shared/FormField.tsx",
+          "frontend/src/components/shared/FileUpload.tsx"
+        ],
+        "modified": []
+      }
+    },
+    {
+      "id": "US-110",
+      "title": "API CRUD générique patrimoine avec audit trail",
+      "description": "Transformer les 5 endpoints GET-only en CRUD complet (GET/PUT/PATCH/reset) avec audit trail systématique. PUT remplace tout le document d'un domaine. PATCH fait un merge partiel (modifier un seul champ sans toucher au reste). POST /reset remet les données par défaut (valeurs mock). Chaque modification écrit dans la collection 'audit_log' : {user_id, action, domain, field, old_value, new_value, source, timestamp}. Validation Pydantic sur toutes les écritures. Réponse systématique : {success: true, data: <document_mis_à_jour>}. Endpoint GET /audit-log avec filtres domaine et période.",
+      "sprint": "S6",
+      "priority": "P0",
+      "status": "done",
+      "product_version": "MVP3",
+      "points": 8,
+      "dependencies": [
+        "US-101"
+      ],
+      "acceptance_criteria": [
+        "PUT /api/v1/{domain} remplace tout le document du domaine pour l'utilisateur courant",
+        "PATCH /api/v1/{domain} merge partiel : ex. PATCH /dashboard avec {tresorerie: {comptesCourants: 15000}} ne modifie que ce champ",
+        "POST /api/v1/{domain}/reset remet les données par défaut (valeurs mock du seed) pour l'utilisateur",
+        "Les 5 domaines (dashboard, epargne, bourse, immobilier, private-equity) supportent PUT/PATCH/reset",
+        "Chaque modification écrit un enregistrement dans audit_log avec old_value et new_value",
+        "Validation Pydantic sur toutes les écritures : retourne 422 si données invalides",
+        "Format réponse uniforme : {success: true, data: <document>} ou {success: false, error: <message>}",
+        "GET /api/v1/audit-log retourne l'historique filtrable par domaine (?domain=dashboard) et période (?days=30)"
+      ],
+      "files": {
+        "new": [
+          "backend/app/models/audit.py",
+          "backend/app/routers/audit.py",
+          "backend/app/services/patrimoine.py"
+        ],
+        "modified": [
+          "backend/app/routers/dashboard.py",
+          "backend/app/routers/epargne.py",
+          "backend/app/routers/bourse.py",
+          "backend/app/routers/immobilier.py",
+          "backend/app/routers/private_equity.py"
+        ]
+      }
+    },
+    {
+      "id": "US-111",
+      "title": "Saisie inline Dashboard : trésorerie, endettement, fiscal, moteur immo",
+      "description": "Rendre chaque bloc du Dashboard éditable avec un pattern d'édition inline. Survol d'une valeur → icône crayon apparaît. Clic → la valeur se transforme en champ de saisie (même taille, même police, fond transparent). Entrée ou clic hors du champ → popup ConfirmDialog 'Modifier X de Y à Z ?'. Confirmer → PATCH API → Toast succès → valeur mise à jour. Annuler → retour à la valeur précédente. Composant InlineEdit réutilisable. Hook useMutation pour les appels PATCH/PUT. Champs éditables : Trésorerie (comptesCourants, epargnePrecaution, banques), Endettement (crd, tauxEndettement, capaciteResiduelle), Fiscal (tmi via sélecteur, ir, ps, tf), Moteur Immo (revenusLocatifsMensuels, mensualitesCredits). Les KPIs en haut sont recalculés automatiquement côté backend après modification.",
+      "sprint": "S6",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP3",
+      "points": 8,
+      "dependencies": [
+        "US-103",
+        "US-110"
+      ],
+      "acceptance_criteria": [
+        "Survol d'une valeur éditable fait apparaître une icône crayon (transition opacity 0→1, 200ms)",
+        "Clic sur la valeur → transformation en champ input inline (même taille, même police display-font ou body)",
+        "Champs éditables Trésorerie : comptesCourants (currency), epargnePrecaution (currency), banques (text)",
+        "Champs éditables Endettement : crd (currency), tauxEndettement (percent), capaciteResiduelle (currency)",
+        "Champs éditables Fiscal : tmi (sélecteur 11/30/41/45%), ir (currency), ps (currency), tf (currency)",
+        "Champs éditables Moteur Immo : revenusLocatifsMensuels (currency), mensualitesCredits (currency)",
+        "Entrée ou blur → ConfirmDialog avec ancien et nouveau valeur, type info",
+        "Confirmation → PATCH /api/v1/dashboard → Toast succès → KPIs haut de page recalculés",
+        "Annulation → retour valeur précédente, aucun appel API"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/components/shared/InlineEdit.tsx",
+          "frontend/src/hooks/useMutation.ts"
+        ],
+        "modified": [
+          "frontend/src/components/dashboard/TreasuryBlock.tsx",
+          "frontend/src/components/dashboard/DebtBlock.tsx",
+          "frontend/src/components/dashboard/FiscalMonitor.tsx",
+          "frontend/src/components/dashboard/RealEstateMotor.tsx"
+        ]
+      }
+    },
+    {
+      "id": "US-112",
+      "title": "Formulaire modale ajout/modification/suppression Livrets (Epargne)",
+      "description": "Modale glassmorphique pour ajouter un nouveau livret ou modifier/supprimer un livret existant. Formulaire : Nom (select : Livret A, LDDS, PEL, CEL, Livret Jeune, Autre), Solde actuel (currency €), Plafond (currency €), Taux (percent %), Statut (select : Actif, Plein, Clôturé). Bouton '+' dans le header du bloc Livrets → Modal avec formulaire vide. Clic sur un livret existant → Modal pré-remplie. Bouton 'Supprimer' rouge dans la modale d'édition → ConfirmDialog danger. Sauvegarde → ConfirmDialog info → PATCH API → Toast → refresh données. Validation : solde ≤ plafond pour Livret A/LDDS, taux > 0. Le total épargne est recalculé automatiquement.",
+      "sprint": "S6",
+      "priority": "P1",
+      "status": "done",
+      "product_version": "MVP3",
+      "points": 5,
+      "dependencies": [
+        "US-103",
+        "US-110"
+      ],
+      "acceptance_criteria": [
+        "Bouton '+' (icône plus dans cercle doré) en haut à droite du bloc Livrets ouvre une Modal vide",
+        "Clic sur un livret existant ouvre la Modal pré-remplie avec ses valeurs actuelles",
+        "Formulaire : Nom (select), Solde (currency), Plafond (currency), Taux (percent), Statut (select)",
+        "Validation : solde ne peut pas dépasser le plafond pour Livret A et LDDS, taux doit être > 0",
+        "Bouton 'Supprimer' (rouge) visible uniquement en mode édition → ConfirmDialog danger 'Supprimer le [nom] ?'",
+        "Bouton 'Sauvegarder' → ConfirmDialog info récapitulant les modifications → PATCH API",
+        "Après sauvegarde : Toast succès, total épargne recalculé, nouvelle carte animée (fadeIn)",
+        "Après suppression : Toast succès, carte supprimée avec animation fadeOut, totaux recalculés"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/components/epargne/LivretForm.tsx"
+        ],
+        "modified": [
+          "frontend/src/components/epargne/LivretBlock.tsx",
+          "frontend/src/components/epargne/EpargneView.tsx"
+        ]
+      }
+    },
+    {
+      "id": "US-113",
+      "title": "Formulaire modale ajout/modification/suppression Positions Bourse",
+      "description": "Modale pour ajouter, modifier ou supprimer une position dans PEA, CTO ou PEA-PME. Formulaire : Enveloppe (select PEA/CTO/PEA-PME, pré-sélectionnée si ouvert depuis une enveloppe), Nom (text), Ticker (text, ex: CW8.PA), Valeur actuelle (currency €), Poids (percent %, auto-calculé si laissé vide = valeur/total enveloppe × 100), Performance YTD (percent %), Plus-value (currency €, peut être négatif). Bouton '+' dans chaque header d'enveloppe. Clic sur une position existante → Modal pré-remplie. Suppression avec ConfirmDialog. Mise à jour automatique du total enveloppe et des actifs financiers globaux.",
+      "sprint": "S6",
+      "priority": "P1",
+      "status": "pending",
+      "product_version": "MVP3",
+      "points": 5,
+      "dependencies": [
+        "US-103",
+        "US-110"
+      ],
+      "acceptance_criteria": [
+        "Bouton '+' dans le header de chaque enveloppe (PEA, CTO, PEA-PME) ouvre la Modal",
+        "Enveloppe pré-sélectionnée dans le select si ouvert depuis un bloc spécifique",
+        "Formulaire : Enveloppe (select), Nom (text requis), Ticker (text requis), Valeur (currency requis), Poids (percent auto), YTD (percent), PV (currency signé)",
+        "Poids auto-calculé si laissé vide : (valeur / total enveloppe) × 100, arrondi à 1 décimale",
+        "Clic sur une position existante ouvre la Modal pré-remplie en mode édition",
+        "Suppression avec ConfirmDialog danger : 'Supprimer la position [nom] ([ticker]) ?'",
+        "Après sauvegarde : total enveloppe recalculé, actifs financiers globaux mis à jour",
+        "Validation : nom et ticker non vides, valeur > 0"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/components/bourse/PositionForm.tsx"
+        ],
+        "modified": [
+          "frontend/src/components/bourse/PeaGrid.tsx",
+          "frontend/src/components/bourse/CtoGrid.tsx",
+          "frontend/src/components/bourse/PeaPmeGrid.tsx",
+          "frontend/src/components/bourse/BourseView.tsx"
+        ]
+      }
+    },
+    {
+      "id": "US-114",
+      "title": "Formulaire modale ajout/modification/suppression Biens Immobiliers",
+      "description": "Modale riche avec formulaire adaptatif selon le type de bien sélectionné. Champ 'Type de bien' (select : LMNP, SCI, SCPI, Résidence Principale) conditionne l'affichage des champs suivants. LMNP : Nom, Type (Studio/T2/T3/Maison), Valeur vénale (€), Loyer mensuel (€), Rendement brut (% auto-calculé = loyer×12/valeur×100), CRD (€), Amortissement restant (années). SCI : Nom, Nombre de parts, Valeur (€), Régime fiscal (IS/IR), Répartition (vous % + conjoint %, total doit = 100%), CRD (€). SCPI : Nom, Nombre de parts, Valeur (€), Rendement (%), Délai jouissance (texte). RP : Valeur (€), CRD (€). Mise à jour automatique de la synthèse et des KPIs.",
+      "sprint": "S6",
+      "priority": "P1",
+      "status": "pending",
+      "product_version": "MVP3",
+      "points": 8,
+      "dependencies": [
+        "US-103",
+        "US-110"
+      ],
+      "acceptance_criteria": [
+        "Select 'Type de bien' affiche dynamiquement les champs correspondants (LMNP, SCI, SCPI, RP)",
+        "LMNP : 7 champs dont rendement brut auto-calculé en temps réel (loyer × 12 / valeur × 100)",
+        "SCI : répartition vous/conjoint avec validation total = 100%, alerte si différent",
+        "SCPI : 5 champs avec rendement en pourcentage et délai jouissance en texte libre",
+        "RP : formulaire simplifié 2 champs (valeur + CRD)",
+        "Bouton '+' visible dans chaque bloc (LMNP, SCI, SCPI) pour ajouter un bien",
+        "Clic sur un bien existant ouvre la Modal en mode édition pré-remplie",
+        "Suppression avec ConfirmDialog danger, sauvegarde avec ConfirmDialog info",
+        "Après modification : synthèse recalculée, KPIs ImmoView mis à jour (valeurVenale, crdTotal, rendementMoyen)"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/components/immobilier/BienForm.tsx"
+        ],
+        "modified": [
+          "frontend/src/components/immobilier/LmnpBlock.tsx",
+          "frontend/src/components/immobilier/SciBlock.tsx",
+          "frontend/src/components/immobilier/ScpiBlock.tsx",
+          "frontend/src/components/immobilier/ImmoView.tsx"
+        ]
+      }
+    },
+    {
+      "id": "US-115",
+      "title": "Formulaire modale ajout/modification/suppression Fonds PE + événements Timeline",
+      "description": "Deux formulaires modaux pour Private Equity. Formulaire Fonds : Nom du fonds (text), Vintage (année, number), Montant investi (currency €), Valorisation (currency €), TVPI (auto-calculé = valorisation/investi, affiché en lecture seule), Statut (select : En cours, Exit, Write-off). Formulaire Événement Timeline : Date (date picker), Type (select : Appel, Distribution), Montant (currency €), Fonds associé (select parmi les fonds existants de l'utilisateur). TVPI auto-calculé. KPIs recalculés (total investi, valorisation, TVPI global). Timeline triée chronologiquement.",
+      "sprint": "S6",
+      "priority": "P2",
+      "status": "pending",
+      "product_version": "MVP3",
+      "points": 5,
+      "dependencies": [
+        "US-103",
+        "US-110"
+      ],
+      "acceptance_criteria": [
+        "Formulaire Fonds : 6 champs, TVPI affiché en lecture seule et recalculé en temps réel",
+        "Formulaire Timeline : 4 champs, select 'Fonds associé' alimenté par les fonds existants",
+        "Bouton '+' dans le header du tableau Fonds et de la Timeline",
+        "Clic sur une ligne du tableau ou un événement → Modal pré-remplie en mode édition",
+        "Suppression avec ConfirmDialog danger pour fonds et événements",
+        "TVPI global recalculé : somme(valorisations) / somme(investis)",
+        "KPIs mis à jour : total investi, valorisation totale, TVPI, DPI",
+        "Timeline triée par date descendante après ajout/modification"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/components/private-equity/FondsForm.tsx",
+          "frontend/src/components/private-equity/TimelineEventForm.tsx"
+        ],
+        "modified": [
+          "frontend/src/components/private-equity/PeTable.tsx",
+          "frontend/src/components/private-equity/PeTimeline.tsx",
+          "frontend/src/components/private-equity/PeView.tsx"
+        ]
+      }
+    },
+    {
+      "id": "US-116",
+      "title": "Bouton Réinitialiser par domaine avec double confirmation",
+      "description": "Bouton discret (icône ↻) dans le header de chaque vue pour réinitialiser toutes les données du domaine aux valeurs par défaut (mock data du seed). Interaction : clic → ConfirmDialog DANGER avec bordure rouge et icône warning : 'Réinitialiser toutes les données [Nom du domaine] aux valeurs par défaut ? Cette action est irréversible.' Confirmer → POST /api/v1/{domain}/reset → Toast succès → reload des données. Annuler → rien. Chaque reset est enregistré dans l'audit_log avec action 'reset'.",
+      "sprint": "S6",
+      "priority": "P1",
+      "status": "pending",
+      "product_version": "MVP3",
+      "points": 3,
+      "dependencies": [
+        "US-103",
+        "US-110"
+      ],
+      "acceptance_criteria": [
+        "Icône reset (↻) discrète dans le header de chaque vue, à côté du titre, opacity 50% au repos",
+        "Survol : opacity 100% + couleur rouge, transition 200ms",
+        "Clic → ConfirmDialog variante 'danger' (bordure rouge, fond rouge-900/20)",
+        "Message : 'Réinitialiser toutes les données [Dashboard/Épargne/Bourse/Immobilier/PE] aux valeurs par défaut ?'",
+        "Sous-message : 'Cette action remplacera toutes vos données actuelles. Elle est irréversible.'",
+        "Confirmation → POST /api/v1/{domain}/reset → Toast succès 'Données réinitialisées'",
+        "Données rechargées automatiquement après le reset (invalidation du cache hook)",
+        "Enregistrement dans audit_log : {action: 'reset', domain: '...', source: 'user_action'}"
+      ],
+      "files": {
+        "new": [],
+        "modified": [
+          "frontend/src/components/dashboard/DashboardView.tsx",
+          "frontend/src/components/epargne/EpargneView.tsx",
+          "frontend/src/components/bourse/BourseView.tsx",
+          "frontend/src/components/immobilier/ImmoView.tsx",
+          "frontend/src/components/private-equity/PeView.tsx"
+        ]
+      }
+    },
+    {
+      "id": "US-120",
+      "title": "Sections masquables/affichables avec préférences persistées",
+      "description": "Permettre à l'utilisateur de masquer/afficher chaque bloc de chaque vue. Icône oeil sur chaque section header pour toggle. Panneau 'Personnaliser l'affichage' accessible depuis le Header (icône engrenage) avec la liste complète des toggles on/off par domaine. Préférences persistées côté serveur dans user.preferences.sections_visibles via PATCH /api/v1/auth/me/preferences. Animation collapse/expand (hauteur 0 + opacity, 300ms cubic-bezier). Sections configurables : Dashboard (8 blocs), Épargne (4), Bourse (4), Immobilier (5), PE (2) = 23 sections au total. Boutons 'Tout afficher' / 'Tout masquer' dans le panneau.",
+      "sprint": "S7",
+      "priority": "P1",
+      "status": "pending",
+      "product_version": "MVP4",
+      "points": 5,
+      "dependencies": [
+        "US-101"
+      ],
+      "acceptance_criteria": [
+        "Icône oeil (ouvert/fermé) sur chaque section header, toggle au clic",
+        "23 sections configurables réparties sur les 5 domaines",
+        "Panneau 'Personnaliser l'affichage' : slide-in depuis la droite, liste de toggles par domaine",
+        "Boutons 'Tout afficher' et 'Tout masquer' en haut du panneau",
+        "Préférences sauvegardées automatiquement via PATCH /api/v1/auth/me/preferences (debounce 500ms)",
+        "Au chargement : sections masquées ne sont pas rendues (ni fetch inutile)",
+        "Animation collapse/expand : hauteur max-height → 0, opacity 1 → 0, 300ms cubic-bezier(0.22,1,0.36,1)",
+        "Accessible depuis le Header : icône engrenage à côté du bouton logout"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/components/shared/CollapsibleSection.tsx",
+          "frontend/src/components/layout/DisplaySettings.tsx",
+          "frontend/src/hooks/useSectionVisibility.ts"
+        ],
+        "modified": [
+          "backend/app/routers/auth.py",
+          "frontend/src/components/layout/Header.tsx",
+          "frontend/src/components/dashboard/DashboardView.tsx",
+          "frontend/src/components/epargne/EpargneView.tsx",
+          "frontend/src/components/bourse/BourseView.tsx",
+          "frontend/src/components/immobilier/ImmoView.tsx",
+          "frontend/src/components/private-equity/PeView.tsx"
+        ]
+      }
+    },
+    {
+      "id": "US-121",
+      "title": "Infrastructure backend upload de documents",
+      "description": "Backend complet pour l'upload, le stockage, le suivi et la gestion des documents financiers. Modèle Document : id (UUID), user_id, type (releve_bancaire/assurance/bilan/officiel/autre), filename, original_filename, content_type, size_bytes, storage_path, upload_date, status (uploaded/processing/parsed/error), metadata (dict flexible), domain (dashboard/epargne/bourse/immobilier/private_equity ou null), parsed_values (dict ou null). Stockage fichiers dans volume Docker /data/uploads/{user_id}/. Endpoints : POST /documents/upload (multipart), GET /documents (liste), GET /documents/{id} (détail), DELETE /documents/{id} (supprime fichier + doc), GET /documents/{id}/download, POST /documents/{id}/parse (extraction), POST /documents/{id}/integrate (intégration patrimoine). Validation MIME type et taille max 10 Mo.",
+      "sprint": "S7",
+      "priority": "P0",
+      "status": "pending",
+      "product_version": "MVP4",
+      "points": 8,
+      "dependencies": [
+        "US-101"
+      ],
+      "acceptance_criteria": [
+        "POST /api/v1/documents/upload accepte multipart/form-data avec fichier + champ 'type'",
+        "Types MIME acceptés : application/pdf, image/jpeg, image/png, text/csv — rejet avec 415 sinon",
+        "Taille maximale : 10 Mo — rejet avec 413 si dépassé",
+        "Fichiers stockés dans /data/uploads/{user_id}/{uuid}.{ext} (volume Docker)",
+        "GET /api/v1/documents retourne la liste des documents de l'utilisateur courant uniquement",
+        "DELETE /api/v1/documents/{id} supprime le fichier sur disque ET le document MongoDB",
+        "GET /api/v1/documents/{id}/download retourne le fichier original avec le bon Content-Type",
+        "Historique des actions dans collection 'upload_history' (upload, parse, integrate, reject)",
+        "Un utilisateur ne peut accéder qu'à ses propres documents (filtre user_id systématique)"
+      ],
+      "files": {
+        "new": [
+          "backend/app/models/document.py",
+          "backend/app/routers/documents.py",
+          "backend/app/services/storage.py"
+        ],
+        "modified": [
+          "docker-compose.yml"
+        ]
+      }
+    },
+    {
+      "id": "US-122",
+      "title": "Frontend page Documents : upload drag & drop, liste, preview",
+      "description": "Nouvel onglet 'Documents' (icône dossier) dans la navigation principale, 6e onglet après PE. Page /documents avec deux zones : zone d'upload drag & drop en haut + liste des documents uploadés en dessous. Chaque document affiché sous forme de carte : miniature (preview image ou icône PDF), nom original, type, date upload, taille, statut (badge coloré). Bouton 'Importer un document' également disponible dans chaque vue patrimoniale (discret, en bas de vue). Upload : barre de progression animée pendant l'envoi, statut 'Uploadé' puis bouton 'Analyser'. Filtre par type de document. Bouton supprimer avec ConfirmDialog. Responsive mobile et desktop.",
+      "sprint": "S7",
+      "priority": "P1",
+      "status": "pending",
+      "product_version": "MVP4",
+      "points": 5,
+      "dependencies": [
+        "US-103",
+        "US-121"
+      ],
+      "acceptance_criteria": [
+        "6e onglet 'Documents' dans la navigation avec icône dossier et couleur accent dédiée",
+        "Page /documents : zone drag & drop en haut (FileUpload component), liste en dessous",
+        "Drag & drop : overlay visuel au survol avec fichier, texte 'Déposez votre fichier ici'",
+        "Carte document : miniature/icône, nom, type (badge), date formatée FR, taille (Ko/Mo), statut (badge coloré)",
+        "Statuts avec badges : Uploadé (bleu), En analyse (amber pulse), Analysé (vert), Erreur (rouge)",
+        "Filtre par type de document : select avec options (Tous, Relevé bancaire, Assurance, Bilan, Officiel, Autre)",
+        "Bouton supprimer sur chaque carte → ConfirmDialog danger 'Supprimer [nom du fichier] ?'",
+        "Bouton 'Importer un document' discret en bas de chaque vue patrimoniale (ouvre la page Documents)"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/components/documents/DocumentsView.tsx",
+          "frontend/src/components/documents/DocumentList.tsx",
+          "frontend/src/components/documents/DocumentCard.tsx",
+          "frontend/src/components/documents/UploadZone.tsx",
+          "frontend/src/hooks/useDocuments.ts",
+          "frontend/src/types/document.ts"
+        ],
+        "modified": [
+          "frontend/src/App.tsx",
+          "frontend/src/components/layout/Header.tsx",
+          "frontend/src/context/NavigationContext.tsx"
+        ]
+      }
+    },
+    {
+      "id": "US-123",
+      "title": "Parsing de relevés bancaires CSV et PDF",
+      "description": "Service backend de parsing automatique des relevés bancaires. Formats supportés : CSV (exports Boursorama, LCL, Société Générale, BNP — détection automatique des colonnes date/libellé/montant/solde) et PDF (extraction texte via pdfplumber puis regex pour identifier soldes, opérations, dates). Données extraites : solde_final, banque_detectee, date_releve, liste d'opérations (date/label/montant), revenus_mensuels estimés, depenses_mensuelles estimées. Flux complet : upload → statut 'uploaded' → clic 'Analyser' → backend parse → statut 'parsed' → frontend affiche preview des valeurs extraites dans un tableau éditable → utilisateur valide/corrige → clic 'Intégrer' → ConfirmDialog → PATCH patrimoine → statut 'integrated'. Gestion erreurs : fichier illisible, format inconnu → statut 'error' avec message explicatif.",
+      "sprint": "S7",
+      "priority": "P1",
+      "status": "pending",
+      "product_version": "MVP4",
+      "points": 13,
+      "dependencies": [
+        "US-121"
+      ],
+      "acceptance_criteria": [
+        "Parsing CSV : détection automatique du séparateur (;/,/tab) et des colonnes (date, libellé, montant, solde)",
+        "Parsing CSV : support des formats Boursorama, LCL, Société Générale, BNP (patterns headers connus)",
+        "Parsing PDF : extraction texte avec pdfplumber, regex pour soldes et opérations",
+        "Détection automatique de la banque émettrice (logos, headers, patterns connus)",
+        "Données extraites structurées : solde_final, banque, date, opérations[], revenus, dépenses",
+        "POST /api/v1/documents/{id}/parse lance le parsing et retourne les valeurs extraites",
+        "Frontend : tableau preview éditable avec les valeurs extraites, l'utilisateur peut corriger chaque ligne",
+        "Clic 'Intégrer' → ConfirmDialog avec résumé → PATCH patrimoine (domaine dashboard : comptesCourants, opérations)",
+        "Gestion erreurs : fichier illisible → statut 'error', message 'Format non reconnu' affiché"
+      ],
+      "files": {
+        "new": [
+          "backend/app/services/parsers/__init__.py",
+          "backend/app/services/parsers/csv_parser.py",
+          "backend/app/services/parsers/pdf_parser.py",
+          "backend/app/services/parsers/bank_detector.py",
+          "frontend/src/components/documents/ParsePreview.tsx",
+          "frontend/src/components/documents/ValueEditor.tsx"
+        ],
+        "modified": [
+          "backend/pyproject.toml"
+        ]
+      }
+    },
+    {
+      "id": "US-124",
+      "title": "Parsing documents d'assurance (vie, PNO, GLI, emprunteur, prévoyance)",
+      "description": "Extraction automatique des données depuis les PDFs de contrats et attestations d'assurance. Détection du type d'assurance (vie, PNO, GLI, MRH, emprunteur, prévoyance) par analyse du contenu. Données extraites par type : Assurance vie → {solde, fonds_euros_pct, uc_pct, rendement_annuel}. PNO/GLI/MRH → {type, bien_assure, statut, prime_annuelle}. Emprunteur → {capital_assure, taux, quotite}. Prévoyance → {capital_deces, ij_mensuelle, invalidite_pct}. Preview des données avec possibilité de correction avant intégration vers le domaine approprié (épargne pour assurance vie et prévoyance, immobilier pour PNO/GLI/MRH). Fallback saisie manuelle si parsing échoue.",
+      "sprint": "S7",
+      "priority": "P2",
+      "status": "pending",
+      "product_version": "MVP4",
+      "points": 8,
+      "dependencies": [
+        "US-121",
+        "US-123"
+      ],
+      "acceptance_criteria": [
+        "Détection automatique du type d'assurance par analyse du contenu PDF (mots-clés, structure)",
+        "Extraction assurance vie : solde, répartition fonds euros/UC, rendement annuel",
+        "Extraction PNO/GLI/MRH : type, bien assuré, statut actif/inactif, prime annuelle",
+        "Extraction emprunteur : capital assuré, taux, quotité de couverture",
+        "Extraction prévoyance : capital décès, indemnités journalières, couverture invalidité",
+        "Preview des données extraites dans un tableau éditable (même composant que US-123)",
+        "Intégration vers le bon domaine : assurance vie/prévoyance → épargne, PNO/GLI/MRH → immobilier",
+        "Si parsing échoue : message 'Extraction automatique impossible' + formulaire de saisie manuelle proposé"
+      ],
+      "files": {
+        "new": [
+          "backend/app/services/parsers/insurance_parser.py"
+        ],
+        "modified": [
+          "backend/app/routers/documents.py",
+          "frontend/src/components/documents/ParsePreview.tsx"
+        ]
+      }
+    },
+    {
+      "id": "US-125",
+      "title": "Parsing bilans comptables et documents officiels",
+      "description": "Extraction des données depuis bilans comptables (SCI, LMNP) et documents officiels (avis d'imposition, relevés PEA/CTO, relevés PER/assurance vie). Documents supportés : Bilan SCI → actif net, résultat, parts, valeur comptable. Bilan LMNP → résultat BIC, amortissements, déficit reportable. Avis d'imposition → revenu fiscal de référence, IR payé, TMI effectif, nombre de parts fiscales. Relevé PEA/CTO → liste positions, plus-values, solde total. Relevé PER/Assurance vie → solde, rendement, répartition supports. Matching intelligent : associer chaque valeur extraite au champ correspondant dans le patrimoine. Preview diff : afficher 'Ancienne valeur → Nouvelle valeur' avant intégration. Rollback possible via l'audit log.",
+      "sprint": "S7",
+      "priority": "P2",
+      "status": "pending",
+      "product_version": "MVP4",
+      "points": 8,
+      "dependencies": [
+        "US-121",
+        "US-123"
+      ],
+      "acceptance_criteria": [
+        "Parsing bilan SCI : extraction actif net, résultat, nombre de parts, valeur comptable",
+        "Parsing bilan LMNP : extraction résultat BIC, amortissements annuels, déficit reportable",
+        "Parsing avis d'imposition : revenu fiscal de référence, IR payé, TMI, nombre de parts",
+        "Parsing relevé PEA/CTO : liste des positions (nom, ticker, quantité, valeur), solde total",
+        "Parsing relevé PER/assurance vie : solde, rendement annuel, répartition des supports",
+        "Matching intelligent : chaque valeur extraite est associée au bon champ patrimonial",
+        "Preview diff : tableau 'Champ | Valeur actuelle | Nouvelle valeur' avant intégration",
+        "Chaque intégration est enregistrée dans l'audit_log avec source 'document_import'"
+      ],
+      "files": {
+        "new": [
+          "backend/app/services/parsers/bilan_parser.py",
+          "backend/app/services/parsers/tax_parser.py",
+          "backend/app/services/parsers/statement_parser.py"
+        ],
+        "modified": [
+          "backend/app/routers/documents.py"
+        ]
+      }
+    },
+    {
+      "id": "US-126",
+      "title": "Vue intégration document : diff avant/après avec checkboxes et confirmation",
+      "description": "Interface de revue complète avant intégration des données extraites d'un document dans le patrimoine. Affichage en tableau : colonnes Champ, Valeur actuelle, Nouvelle valeur, Checkbox sélection. Checkboxes individuelles pour sélectionner/désélectionner chaque valeur à intégrer. Boutons 'Tout sélectionner' / 'Tout désélectionner'. Résumé en bas : 'X valeurs seront modifiées'. Bouton 'Intégrer les données' → ConfirmDialog final avec récapitulatif. Animation de succès (checkmark vert animé). Lien vers l'audit log pour cette opération. Design glassmorphique cohérent avec l'app.",
+      "sprint": "S7",
+      "priority": "P1",
+      "status": "pending",
+      "product_version": "MVP4",
+      "points": 5,
+      "dependencies": [
+        "US-122",
+        "US-123"
+      ],
+      "acceptance_criteria": [
+        "Tableau diff : colonnes Champ (label FR), Actuel (formaté €/%), Nouveau (formaté, surligné si différent), Checkbox",
+        "Valeurs modifiées : fond vert-900/10, valeur actuelle barrée, nouvelle en gras",
+        "Valeurs identiques : fond neutre, checkbox décochée par défaut",
+        "Boutons 'Tout sélectionner' / 'Tout désélectionner' fonctionnels",
+        "Résumé dynamique : 'X valeurs seront modifiées sur Y extraites'",
+        "Bouton 'Intégrer' → ConfirmDialog info avec résumé des X modifications sélectionnées",
+        "Après intégration : animation checkmark vert, Toast succès, lien vers /historique",
+        "Bouton 'Annuler' ferme la vue sans aucune modification"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/components/documents/IntegrationView.tsx",
+          "frontend/src/components/documents/DiffTable.tsx"
+        ],
+        "modified": [
+          "frontend/src/components/documents/DocumentsView.tsx"
+        ]
+      }
+    },
+    {
+      "id": "US-130",
+      "title": "Service de recalcul automatique et cohérence des données",
+      "description": "Service backend RecalculService appelé automatiquement après chaque écriture (PATCH/PUT/reset/integrate). Recalculs : ajout/modif livret → epargne.total = somme soldes. Ajout/modif position → envelope.total = somme positions, actifsFinanciers = somme envelopes. Ajout/modif bien LMNP → rendement = (loyer×12/valeur)×100. Ajout/modif bien → valeurVenale = somme valeurs, crdTotal = somme CRD. Ajout/modif fonds PE → tvpi = valorisation/investi, totaux. Toute modification dans n'importe quel domaine → recalcul du Dashboard : patrimoineBrut = somme(immo+bourse+epargne+crypto), patrimoineNet = brut-CRD, repartition recalculée avec pourcentages à 100%. Validation : montants négatifs refusés (sauf opérations). Tests unitaires.",
+      "sprint": "S8",
+      "priority": "P1",
+      "status": "pending",
+      "product_version": "MVP5",
+      "points": 8,
+      "dependencies": [
+        "US-110"
+      ],
+      "acceptance_criteria": [
+        "RecalculService appelé automatiquement dans patrimoine.py après chaque PATCH/PUT/reset/integrate",
+        "Modif livret → epargne.total = somme des soldes de tous les livrets + assurance vie",
+        "Modif position → envelope.total recalculé, actifsFinanciers = somme PEA+CTO+PEA-PME",
+        "Modif bien LMNP → rendement = (loyer × 12 / valeur) × 100, arrondi 1 décimale",
+        "Modif bien quelconque → valeurVenale = somme valeurs, crdTotal = somme CRD",
+        "Modif fonds PE → tvpi = somme(valorisations) / somme(investis)",
+        "Toute modification → Dashboard recalculé : patrimoineBrut, patrimoineNet, repartition (% à 100%)",
+        "Les montants négatifs sont refusés avec erreur 422 (sauf champ montant dans opérations)",
+        "Test : modifier un livret (solde +1000) et vérifier que patrimoineBrut augmente de 1000"
+      ],
+      "files": {
+        "new": [
+          "backend/app/services/recalcul.py",
+          "backend/tests/test_recalcul.py"
+        ],
+        "modified": [
+          "backend/app/services/patrimoine.py"
+        ]
+      }
+    },
+    {
+      "id": "US-131",
+      "title": "Page Historique des modifications (audit log UI)",
+      "description": "Page /historique avec timeline visuelle de toutes les modifications apportées au patrimoine. Chaque entrée : icône contextuelle (crayon=modif, plus=ajout, croix=suppression, ↻=reset, document=import), timestamp formaté FR, domaine > section, ancien → nouveau valeur, source (saisie manuelle / import document / reset). Filtres : par domaine (select), par période (boutons 7j/30j/90j/Tout). Pagination 20 entrées par page. Design cohérent glassmorphism.",
+      "sprint": "S8",
+      "priority": "P2",
+      "status": "pending",
+      "product_version": "MVP5",
+      "points": 5,
+      "dependencies": [
+        "US-110"
+      ],
+      "acceptance_criteria": [
+        "Page /historique accessible depuis la navigation (icône horloge ou lien dans le footer)",
+        "Timeline verticale : chaque entrée dans un glass-panel-inner avec icône, timestamp, détails",
+        "Icônes contextuelles : crayon (modif), plus-cercle (ajout), croix-cercle (suppression), ↻ (reset), document (import)",
+        "Format : 'Aujourd'hui, 14:32 — Dashboard > Trésorerie' + 'comptesCourants : 12 450 € → 14 200 €'",
+        "Source affichée : 'Saisie manuelle', 'Import relevé bancaire', 'Réinitialisation'",
+        "Filtres : select domaine (Tous/Dashboard/Épargne/Bourse/Immo/PE) + boutons période (7j/30j/90j/Tout)",
+        "Pagination : 20 entrées par page, boutons Précédent/Suivant",
+        "GET /api/v1/audit-log?domain=dashboard&days=30&page=1&limit=20"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/components/historique/HistoriqueView.tsx",
+          "frontend/src/components/historique/AuditEntry.tsx",
+          "frontend/src/hooks/useAuditLog.ts",
+          "frontend/src/types/audit.ts"
+        ],
+        "modified": [
+          "frontend/src/App.tsx",
+          "backend/app/routers/audit.py"
+        ]
+      }
+    },
+    {
+      "id": "US-132",
+      "title": "Onboarding guidé pour les nouveaux utilisateurs",
+      "description": "Parcours guidé affiché uniquement au premier login (flag onboarding_completed dans le profil user). Étape 1 : 'Bienvenue sur Aura Wealth' — présentation rapide en 3 slides glassmorphiques (dots de navigation en bas). Étape 2 : 'Comment souhaitez-vous commencer ?' — 3 choix : Import rapide (uploader un relevé bancaire → parsing → intégration), Saisie manuelle (redirige vers le wizard US-133), Données de démo (pré-remplit avec les valeurs mock pour explorer). Étape 3 : choix des sections à afficher (toggles). Étape 4 : redirection vers le Dashboard. Skip possible à chaque étape. PATCH /auth/me avec onboarding_completed=true à la fin.",
+      "sprint": "S8",
+      "priority": "P2",
+      "status": "pending",
+      "product_version": "MVP5",
+      "points": 5,
+      "dependencies": [
+        "US-102",
+        "US-103"
+      ],
+      "acceptance_criteria": [
+        "Onboarding apparaît uniquement au premier login (user.onboarding_completed === false)",
+        "Étape 1 : 3 slides de présentation avec dots de navigation, animation slideLeft entre les slides",
+        "Étape 2 : 3 cartes de choix avec icônes (upload, formulaire, demo), hover card-hover",
+        "Choix 'Import rapide' → redirige vers page Documents avec zone upload active",
+        "Choix 'Saisie manuelle' → redirige vers le wizard (US-133) ou saisie directe",
+        "Choix 'Données de démo' → POST /api/v1/all/reset → pré-remplit avec mock data → redirige Dashboard",
+        "Étape 3 : toggles sections (reprend le composant DisplaySettings de US-120)",
+        "Bouton 'Passer' visible à chaque étape, PATCH /auth/me {onboarding_completed: true} à la fin"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/components/onboarding/OnboardingFlow.tsx",
+          "frontend/src/components/onboarding/WelcomeSlides.tsx",
+          "frontend/src/components/onboarding/StartChoice.tsx"
+        ],
+        "modified": [
+          "frontend/src/App.tsx",
+          "backend/app/routers/auth.py"
+        ]
+      }
+    },
+    {
+      "id": "US-133",
+      "title": "Wizard saisie rapide multi-domaine (6 étapes)",
+      "description": "Formulaire wizard multi-étapes pour saisir l'ensemble du patrimoine en une seule session. 6 étapes : 1/6 Épargne (livrets, assurance vie), 2/6 Retraite (PER, PERCOL, prévoyance), 3/6 Bourse (PEA, CTO, crypto), 4/6 Immobilier (biens, SCI, SCPI), 5/6 Private Equity (fonds), 6/6 Fiscal (TMI, charges). Barre de progression en haut (6 segments, segment actif doré). Navigation : boutons Précédent / Suivant / Sauter cette étape. Les données sont sauvegardées à chaque étape via PATCH API (pas besoin de tout remplir d'un coup). Résumé final avant validation avec vue d'ensemble du patrimoine saisi. ConfirmDialog avant la validation finale.",
+      "sprint": "S8",
+      "priority": "P2",
+      "status": "pending",
+      "product_version": "MVP5",
+      "points": 8,
+      "dependencies": [
+        "US-103",
+        "US-110"
+      ],
+      "acceptance_criteria": [
+        "6 étapes avec barre de progression : segments 1-6, segment actif fond doré, complétés en vert",
+        "Étape 1 Épargne : formulaires livrets (nom/solde/plafond/taux) + assurance vie (solde/répartition)",
+        "Étape 2 Retraite : PER (solde/rendement) + PERCOL + prévoyance (capital décès/IJ)",
+        "Étape 3 Bourse : enveloppes (PEA/CTO total + positions) + crypto (BTC/ETH/Alts valeurs)",
+        "Étape 4 Immobilier : biens LMNP (nom/valeur/loyer/CRD) + SCI + SCPI + RP",
+        "Étape 5 PE : fonds (nom/vintage/investi/valorisation/statut)",
+        "Étape 6 Fiscal : TMI (sélecteur), IR, PS, TF estimés",
+        "Boutons 'Précédent' / 'Suivant' / 'Sauter' sur chaque étape, données PATCH à chaque passage",
+        "Page résumé finale : vue d'ensemble patrimoine avec totaux par domaine, ConfirmDialog avant validation"
+      ],
+      "files": {
+        "new": [
+          "frontend/src/components/wizard/WizardFlow.tsx",
+          "frontend/src/components/wizard/WizardProgress.tsx",
+          "frontend/src/components/wizard/steps/EpargneStep.tsx",
+          "frontend/src/components/wizard/steps/RetraiteStep.tsx",
+          "frontend/src/components/wizard/steps/BourseStep.tsx",
+          "frontend/src/components/wizard/steps/ImmobilierStep.tsx",
+          "frontend/src/components/wizard/steps/PeStep.tsx",
+          "frontend/src/components/wizard/steps/FiscalStep.tsx",
+          "frontend/src/components/wizard/WizardSummary.tsx"
+        ],
+        "modified": [
+          "frontend/src/App.tsx"
+        ]
+      }
+    },
+    {
+      "id": "US-134",
+      "title": "Notifications et alertes patrimoniales automatiques",
+      "description": "Système d'alertes automatiques calculées côté backend après chaque modification patrimoniale. Alertes : Livret plein (solde ≥ plafond, Info), Endettement élevé (taux > 33%, Warning), IFI potentiel (immobilier net > 1.3M€, Warning), Cash-flow négatif (cashflow < 0, Danger), Position en forte perte (YTD < -20%, Warning), Document ancien (dernière mise à jour > 6 mois, Info). Endpoint GET /api/v1/alerts retourne les alertes actives pour l'utilisateur. Badge notification dans le Header (nombre d'alertes non lues). Panneau alertes slide-in depuis la droite avec liste. Chaque alerte est dismissable par l'utilisateur (persisté dans ses préférences).",
+      "sprint": "S8",
+      "priority": "P3",
+      "status": "pending",
+      "product_version": "MVP5",
+      "points": 5,
+      "dependencies": [
+        "US-130"
+      ],
+      "acceptance_criteria": [
+        "Backend : calcul des alertes dans AlertService appelé après RecalculService",
+        "6 types d'alertes avec seuils configurables : livret plein, endettement, IFI, cashflow, perte, ancienneté",
+        "GET /api/v1/alerts retourne les alertes actives : [{id, type, severity, title, message, domain, dismissed}]",
+        "Badge rouge dans le Header avec le nombre d'alertes non-dismissed (animation pulse si > 0)",
+        "Clic sur le badge → panneau slide-in (à droite) avec la liste des alertes",
+        "Chaque alerte : icône severity (info=bleu, warning=amber, danger=rouge), titre, message, bouton dismiss",
+        "Dismiss → PATCH /api/v1/alerts/{id}/dismiss → alerte masquée (persisté user preferences)",
+        "Les alertes sont recalculées à chaque modification patrimoine, les anciennes dismissed restent dismissed"
+      ],
+      "files": {
+        "new": [
+          "backend/app/services/alerts.py",
+          "backend/app/models/alert.py",
+          "backend/app/routers/alerts.py",
+          "frontend/src/components/layout/AlertBadge.tsx",
+          "frontend/src/components/layout/AlertPanel.tsx",
+          "frontend/src/hooks/useAlerts.ts",
+          "frontend/src/types/alert.ts"
+        ],
+        "modified": [
+          "frontend/src/components/layout/Header.tsx",
+          "backend/app/services/patrimoine.py"
+        ]
+      }
+    }
+  ]
+}

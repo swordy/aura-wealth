@@ -1,0 +1,348 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gold: #D4AF37;
+  --gold-light: #F3E5AB;
+  --gold-dark: #AA8020;
+  --panel-bg: rgba(0, 0, 0, 0.45);
+  --panel-border: rgba(212, 175, 55, 0.25);
+  --tab-home: #D4AF37;
+  --tab-finance: #10B981;
+  --tab-bourse: #3B82F6;
+  --tab-immo: #D97706;
+  --tab-pe: #8B5CF6;
+  --tab-documents: #06B6D4;
+  --tab-historique: #F59E0B;
+
+  /* ── Semantic Tokens (dark defaults) ── */
+  --text-primary: #ffffff;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  --text-faint: #6b7280;
+  --surface-bg: #030303;
+  --surface-inner: rgba(0, 0, 0, 0.3);
+  --surface-overlay: rgba(0, 0, 0, 0.6);
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --input-bg: rgba(0, 0, 0, 0.4);
+  --input-placeholder: #6b7280;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --border-section: #1f2937;
+  --card-shadow: rgba(0, 0, 0, 0.4);
+  --tooltip-bg: rgba(0, 0, 0, 0.9);
+  --tooltip-text: #ccc;
+  --progress-track: rgba(255, 255, 255, 0.08);
+  --backdrop: rgba(0, 0, 0, 0.7);
+}
+
+html.light {
+  /* Immaculate white + deep dark accents */
+  --gold: #8C7225;
+  --gold-light: #B8983A;
+  --gold-dark: #6B5519;
+  --panel-bg: rgba(255, 255, 255, 0.85);
+  --panel-border: rgba(0, 0, 0, 0.06);
+  --text-primary: #111111;
+  --text-secondary: #2a2a2a;
+  --text-muted: #555555;
+  --text-faint: #8a8a8a;
+  --surface-bg: #ffffff;
+  --surface-inner: rgba(248, 248, 248, 0.8);
+  --surface-overlay: rgba(0, 0, 0, 0.02);
+  --surface-hover: rgba(0, 0, 0, 0.03);
+  --input-bg: rgba(245, 245, 245, 0.9);
+  --input-placeholder: #8a8a8a;
+  --border-subtle: rgba(0, 0, 0, 0.05);
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
+  --border-section: rgba(0, 0, 0, 0.06);
+  --card-shadow: rgba(0, 0, 0, 0.04);
+  --tooltip-bg: rgba(17, 17, 17, 0.95);
+  --tooltip-text: #f5f5f5;
+  --progress-track: rgba(0, 0, 0, 0.06);
+  --backdrop: rgba(0, 0, 0, 0.25);
+
+  /* Muted, darker tab colors for sobriety */
+  --tab-home: #8C7225;
+  --tab-finance: #1B6B4A;
+  --tab-bourse: #2554A0;
+  --tab-immo: #8B5A00;
+  --tab-pe: #5B3FA0;
+  --tab-documents: #0E6B7A;
+  --tab-historique: #9A6D0A;
+}
+
+html.light body {
+  background: #fafafa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "DM Sans", sans-serif;
+  background: var(--surface-bg);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Smooth theme transition (excluded on animated elements) */
+html.transitioning *,
+html.transitioning *::before,
+html.transitioning *::after {
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease, box-shadow 200ms ease !important;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: "Cormorant Garamond", serif;
+}
+
+/* ── Utility Classes (from maquette) ── */
+.text-gold { color: var(--gold); }
+.border-gold { border-color: var(--gold); }
+.bg-gold { background: var(--gold); }
+.bg-gold-gradient { background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #AA8020 100%); }
+
+/* ── Nav Button ── */
+.nav-btn {
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  position: relative;
+}
+.nav-btn::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--active-tab, var(--gold));
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+.nav-btn.active::after {
+  width: 100%;
+}
+
+/* ── Glass Panel ── */
+.glass-panel {
+  background: var(--panel-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 4px 30px var(--card-shadow);
+}
+
+.glass-panel-inner {
+  background: var(--surface-inner);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ── Card Hover ── */
+.card-hover {
+  transition: all 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px var(--card-shadow);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+/* ── Glow Line ── */
+.glow-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(212, 175, 55, 0.4),
+    transparent
+  );
+}
+
+/* ── Light mode refinements ── */
+html.light .glass-panel {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 4px 16px rgba(0, 0, 0, 0.02);
+}
+html.light .glass-panel-inner {
+  background: rgba(250, 250, 250, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+html.light .card-hover:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+html.light .glow-line {
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.08), transparent);
+}
+html.light .spark-ai:hover {
+  filter: drop-shadow(0 0 6px rgba(140, 114, 37, 0.5));
+}
+html.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+}
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+html.light .tab-indicator {
+  opacity: 0.35;
+}
+html.light .bg-gold-gradient {
+  background: linear-gradient(135deg, #8C7225 0%, #B8983A 50%, #6B5519 100%);
+}
+/* Muted status colors in light mode */
+html.light .text-green-400 { color: #15803d; }
+html.light .text-green-300 { color: #16a34a; }
+html.light .text-red-400 { color: #b91c1c; }
+html.light .text-red-300 { color: #dc2626; }
+html.light .text-blue-400 { color: #1d4ed8; }
+html.light .text-blue-300 { color: #2563eb; }
+html.light .text-amber-400 { color: #92400e; }
+html.light .text-amber-300 { color: #a16207; }
+html.light .text-purple-300 { color: #6d28d9; }
+html.light .text-cyan-300 { color: #0e7490; }
+
+/* ── Progress Bar ── */
+.progress-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--progress-track);
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Tag ── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── Spark AI ── */
+.spark-ai {
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 10;
+}
+.spark-ai:hover {
+  transform: scale(1.25) rotate(15deg);
+  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.9));
+}
+
+/* ── Stagger Children ── */
+.stagger > * {
+  opacity: 0;
+  animation: fadeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger > *:nth-child(6) { animation-delay: 0.3s; }
+
+/* ── Tab Indicator ── */
+.tab-indicator {
+  height: 3px;
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+  opacity: 0.6;
+}
+
+/* ── Tooltip ── */
+.tooltip-wrapper {
+  position: relative;
+}
+.tooltip-wrapper .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--tooltip-bg);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--tooltip-text);
+  white-space: normal;
+  width: max-content;
+  max-width: 260px;
+  text-align: center;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+  z-index: 100;
+  pointer-events: none;
+}
+.tooltip-wrapper:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.2);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.5);
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGold {
+  0% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(212, 175, 55, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+  }
+}
